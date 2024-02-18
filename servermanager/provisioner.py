@@ -86,7 +86,9 @@ class LinodeProvisioner():
         return True
 
     def get_instance(self) -> Optional[Instance]:
-        instances = self.client.linode.instances()
+        instances = self.client.linode.instances(
+            Instance.label == self.config.linode_label
+        )
         for instance in instances:
             if instance.label == self.config.linode_label:
                 return instance
