@@ -11,3 +11,13 @@
 # 1. Run shutoff script (graceful shutdown of server)
 # 2. Rsync files back to local directory
 # 3. Linode API to delete linode
+
+from servermanager.config import LinodeProvisionerConfig
+
+
+class LinodeProvisioner():
+
+    config: LinodeProvisionerConfig
+
+    def __init__(self, config: LinodeProvisionerConfig):
+        self.config = config
