@@ -4,3 +4,4 @@ sync
 # Python
 venv
 *.pyc
+.mypy_cache
