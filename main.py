@@ -1,21 +1,30 @@
 import configparser
 import sys
-import servermanager
+from servermanager import LinodeProvisioner, LinodeProvisionerConfig
+import logging
 
 
 def main():
     config = configparser.ConfigParser()
     config.read("config.ini")
-    server_config = servermanager.LinodeProvisionerConfig(**config["linode"])
-    server_config.update_from_env()
+    server_config = LinodeProvisionerConfig(**config["linode"])
+
+    provisioner = LinodeProvisioner(server_config)
+    cur_instance = provisioner.get_instance()
+    print("Is up" if cur_instance else "Not up")
 
     action = sys.argv[1]
     if action == "start":
-        pass
+        provisioner.start()
     elif action == "stop":
-        pass
+        provisioner.stop()
+    elif action == "info":
+        print("Instance ready", provisioner.instance_ready())
     else:
         print("unknown action", action)
 
+
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(module)s  %(message)s')
     main()
