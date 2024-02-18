@@ -14,6 +14,7 @@ def main():
 
     if len(sys.argv) < 2:
         print("Must provide an action: 'start', 'stop'")
+        return
 
     action = sys.argv[1]
     if action == "start":
