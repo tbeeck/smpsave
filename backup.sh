@@ -12,5 +12,3 @@ for dir in "${DIRS[@]}"; do
     echo "Sync from $source_dir to $dest_dir"
     rsync -avz -e ssh "$source_dir" "$dest_dir"
 done
-
-
