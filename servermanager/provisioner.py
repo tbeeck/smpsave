@@ -1,27 +1,12 @@
 import logging
 import time
-from typing import Optional
+from typing import Callable, Optional
 
 from linode_api4 import Instance, IPAddress, LinodeClient  # type: ignore
 
 from servermanager.config import LinodeProvisionerConfig
 
 log = logging.getLogger(__name__)
-
-
-# Set up / tear down the linode
-
-# Standup steps:
-# 1. Call linode API to provision linode
-# 2. Wait for linode to be ready
-# 3. Rsync server files
-# 4. Run entry point
-# 5. Check server started healthily?
-
-# Shutdown steps:
-# 1. Run shutoff script (graceful shutdown of server)
-# 2. Rsync files back to local directory
-# 3. Linode API to delete linode
 
 POLL_TIMEOUT_SECONDS = 100
 POLL_INTERVAL_SECONDS = 5
@@ -31,11 +16,15 @@ class LinodeProvisioner():
 
     config: LinodeProvisionerConfig
     client: LinodeClient
+    poststart_hooks: list[Callable]
+    prestop_hooks: list[Callable]
 
     def __init__(self, config: LinodeProvisionerConfig):
         self.config = config
         self.config.update_from_env()
         self.client = LinodeClient(self.config.access_token)
+        self.poststart_hooks = []
+        self.prestop_hooks = []
 
     def start(self) -> Instance:
         """ Start the gameserver linode.
@@ -45,7 +34,6 @@ class LinodeProvisioner():
             log.info(
                 "Instance already exists, skipping provision step")
             return
-
         instance, _ = self.client.linode.instance_create(
             ltype=self.config.linode_type,
             region=self.config.linode_region,
@@ -53,6 +41,7 @@ class LinodeProvisioner():
             label=self.config.linode_label,
         )
         self._poll_until_instance_ready(instance)
+        self._run_poststart_hooks()
         return instance
 
     def _poll_until_instance_ready(self, instance: Instance) -> bool:
@@ -62,6 +51,7 @@ class LinodeProvisioner():
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be ready")
             time.sleep(POLL_INTERVAL_SECONDS)
+        log.info(f"Instance ready, id '{instance.id}'")
         return True
 
     def stop(self):
@@ -70,6 +60,7 @@ class LinodeProvisioner():
         if not instance:
             log.info("No instance found, skipping stop step.")
             return
+        self._run_prestop_hooks()
         result = instance.delete()
         if not result:
             raise Exception(
@@ -83,7 +74,24 @@ class LinodeProvisioner():
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be deleted")
             time.sleep(POLL_INTERVAL_SECONDS)
+        log.info(f"Instance shutdown successfully.")
         return True
+
+    def _run_poststart_hooks(self):
+        try:
+            for hook in self.poststart_hooks:
+                hook()
+        except Exception as e:
+            log.error(f"Post-start hook {hook.__name__} failed: ", e)
+            raise Exception("Post start hook failed", e)
+
+    def _run_prestop_hooks(self):
+        try:
+            for hook in self.prestop_hooks:
+                hook()
+        except Exception as e:
+            log.error(f"Pre-stop hook {hook.__name__} failed: ", e)
+            raise Exception("Pre-stop hook failed", e)
 
     def get_instance(self) -> Optional[Instance]:
         instances = self.client.linode.instances(
