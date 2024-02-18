@@ -1,7 +1,8 @@
 import configparser
-import sys
-from servermanager import LinodeProvisioner, LinodeProvisionerConfig
 import logging
+import sys
+
+from servermanager import LinodeProvisioner, LinodeProvisionerConfig
 
 
 def main():
@@ -10,8 +11,9 @@ def main():
     server_config = LinodeProvisionerConfig(**config["linode"])
 
     provisioner = LinodeProvisioner(server_config)
-    cur_instance = provisioner.get_instance()
-    print("Is up" if cur_instance else "Not up")
+
+    if len(sys.argv) < 2:
+        print("Must provide an action: 'start', 'stop'")
 
     action = sys.argv[1]
     if action == "start":
