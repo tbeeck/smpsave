@@ -1,3 +1,6 @@
+# Backup
 sync
-venv
 
+# Python
+venv
+*.pyc
