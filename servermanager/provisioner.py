@@ -2,7 +2,7 @@ import logging
 import time
 from typing import Callable, Optional
 
-from linode_api4 import Instance, IPAddress, LinodeClient  # type: ignore
+from linode_api4 import Instance, LinodeClient  # type: ignore
 
 from servermanager.config import LinodeProvisionerConfig
 

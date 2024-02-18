@@ -21,8 +21,6 @@ def main():
         provisioner.start()
     elif action == "stop":
         provisioner.stop()
-    elif action == "info":
-        print("Instance ready", provisioner.instance_ready())
     else:
         print("unknown action", action)
 
