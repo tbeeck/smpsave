@@ -2,7 +2,7 @@ import os
 
 from attr import dataclass
 
-CONFIG_NAMESPACE = "linode"
+LINODE_CONFIG_NAMESPACE = "linode"
 
 
 @dataclass
