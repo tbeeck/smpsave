@@ -41,7 +41,9 @@ class LinodeProvisioner():
             label=self.config.linode_label,
         )
         self._poll_until_instance_ready(instance)
+        log.info("Instance started successfully.")
         self._run_poststart_hooks()
+        log.info("Post-start hooks completed.")
         return instance
 
     def _poll_until_instance_ready(self, instance: Instance) -> bool:
@@ -61,11 +63,13 @@ class LinodeProvisioner():
             log.info("No instance found, skipping stop step.")
             return
         self._run_prestop_hooks()
+        log.info("Pre-stop hooks completed.")
         result = instance.delete()
         if not result:
             raise Exception(
                 f"Failed to delete linode instance {instance.label}")
         self._poll_until_instance_stopped()
+        log.info("Instance stoped successfully")
 
     def _poll_until_instance_stopped(self) -> bool:
         log.debug(f"Polling until instance is deleted.")
@@ -74,7 +78,6 @@ class LinodeProvisioner():
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be deleted")
             time.sleep(POLL_INTERVAL_SECONDS)
-        log.info(f"Instance shutdown successfully.")
         return True
 
     def _run_poststart_hooks(self):
