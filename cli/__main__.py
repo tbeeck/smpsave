@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from bootstrapper.factory import build_linode_provisioner
+from bootstrap.factory import build_linode_provisioner
 
 
 @click.group()
@@ -22,6 +22,11 @@ def stop():
     print("Running stop")
     provisioner = build_linode_provisioner()
     provisioner.stop()
+
+@cli.command()
+def get_ip():
+    provisioner = build_linode_provisioner()
+    print("host", provisioner.get_host())
 
 
 if __name__ == '__main__':

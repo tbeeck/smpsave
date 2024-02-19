@@ -34,12 +34,14 @@ class LinodeProvisioner():
             log.info(
                 "Instance already exists, skipping provision step")
             return
+        log.info("Starting instance")
         instance, _ = self.client.linode.instance_create(
             ltype=self.config.linode_type,
             region=self.config.linode_region,
             image=self.config.linode_image,
             label=self.config.linode_label,
         )
+        log.info(f"Instance id: {instance.id}")
         self._poll_until_instance_ready(instance)
         log.info("Instance started successfully.")
         self._run_poststart_hooks()
@@ -53,7 +55,6 @@ class LinodeProvisioner():
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be ready")
             time.sleep(POLL_INTERVAL_SECONDS)
-        log.info(f"Instance ready, id '{instance.id}'")
         return True
 
     def stop(self):
@@ -72,7 +73,6 @@ class LinodeProvisioner():
         log.info("Instance stoped successfully")
 
     def _poll_until_instance_stopped(self) -> bool:
-        log.debug(f"Polling until instance is deleted.")
         timeout_time = time.time() + POLL_TIMEOUT_SECONDS
         while self.get_instance():
             if time.time() > timeout_time:
@@ -104,3 +104,11 @@ class LinodeProvisioner():
             if instance.label == self.config.linode_label:
                 return instance
         return None
+
+    def get_host(self) -> Optional[str]:
+        instance = self.get_instance()
+        if not instance:
+            return None
+        if len(instance.ipv4) < 1:
+            raise Exception("No public IP found for instance")
+        return instance.ipv4[0]
