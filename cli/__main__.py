@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from bootstrap.factory import build_linode_provisioner
+from core.factory import build_linode_provisioner
 
 
 @click.group()
