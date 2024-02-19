@@ -3,6 +3,7 @@ import logging
 import click
 
 from core.factory import build_linode_provisioner
+from discordbot.factory import build_bot
 
 
 @click.group()
@@ -40,6 +41,12 @@ def run(lifecycle: str):
     else:
         print("Unknown lifecycle stage:", lifecycle)
         exit(1)
+
+
+@cli.command
+def bot():
+    client, token = build_bot()
+    client.run(token)
 
 
 if __name__ == '__main__':

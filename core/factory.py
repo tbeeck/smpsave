@@ -1,7 +1,7 @@
 import logging
 from configparser import ConfigParser
 
-from core.config import CORE_CONFIG_NAMESPACE, CoreConfig
+from core.config import CORE_CONFIG_NAMESPACE, CoreConfig, get_all_configurations
 from core.filesync import build_backup_closure, build_upload_closure
 from core.sever_lifecycle import (buid_stop_closure, build_bootstrap_closure,
                                   build_start_closure)
@@ -12,8 +12,7 @@ log = logging.getLogger(__name__)
 
 
 def build_linode_provisioner() -> LinodeProvisioner:
-    config = ConfigParser()
-    config.read("config.ini")
+    config = get_all_configurations()
     core_config = CoreConfig(**config[CORE_CONFIG_NAMESPACE])
     server_config = LinodeProvisionerConfig(**config[LINODE_CONFIG_NAMESPACE])
     provisioner = LinodeProvisioner(server_config)

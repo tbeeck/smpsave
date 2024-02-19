@@ -14,7 +14,7 @@ class LinodeProvisionerConfig():
     linode_region: str
     public_key_path: str
 
-    def update_from_env(self):
+    def populate_from_env(self):
         if os.getenv("LINODE_TOKEN") != None:
             self.access_token = os.getenv("LINODE_TOKEN")
 

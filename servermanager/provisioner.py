@@ -21,7 +21,7 @@ class LinodeProvisioner():
 
     def __init__(self, config: LinodeProvisionerConfig):
         self.config = config
-        self.config.update_from_env()
+        self.config.populate_from_env()
         self.client = LinodeClient(self.config.access_token)
         self.poststart_hooks = []
         self.prestop_hooks = []
