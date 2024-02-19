@@ -1,5 +1,3 @@
-import os
-
 from attr import dataclass
 
 CORE_CONFIG_NAMESPACE = "core"
@@ -9,5 +7,4 @@ CORE_CONFIG_NAMESPACE = "core"
 class CoreConfig():
     local_server_dir: str
     remote_server_dir: str
-    remote_server_host: str
     remote_server_user: str

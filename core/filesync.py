@@ -4,7 +4,7 @@ import subprocess
 
 
 def rsync(src: str, dst: str) -> int:
-    command = ['rsync', '-avz', src, dst]
+    command = ['rsync', '-avz', '-e', 'ssh -o StrictHostKeyChecking=no', src, dst]
 
     try:
         process = subprocess.run(command, check=False)

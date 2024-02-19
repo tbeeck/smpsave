@@ -12,6 +12,7 @@ class LinodeProvisionerConfig():
     linode_image: str
     linode_label: str
     linode_region: str
+    public_key_path: str
 
     def update_from_env(self):
         if os.getenv("LINODE_TOKEN") != None:

@@ -40,6 +40,7 @@ class LinodeProvisioner():
             region=self.config.linode_region,
             image=self.config.linode_image,
             label=self.config.linode_label,
+            authorized_keys=[self.config.public_key_path]
         )
         log.info(f"Instance id: {instance.id}")
         self._poll_until_instance_ready(instance)

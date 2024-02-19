@@ -19,12 +19,12 @@ def build_linode_provisioner() -> LinodeProvisioner:
 
     def upload_server():
         source = core_config.local_server_dir
-        destination = f"{core_config.remote_server_user}@{core_config.remote_server_host}:{core_config.remote_server_dir}"
+        destination = f"{core_config.remote_server_user}@{provisioner.get_host()}:{core_config.remote_server_dir}"
         log.info(f"Uploading server from {source} to {destination}")
         rsync(source, destination)
 
     def backup_server():
-        source = f"{core_config.remote_server_user}@{core_config.remote_server_host}:{core_config.remote_server_dir}"
+        source = f"{core_config.remote_server_user}@{provisioner.get_host()}:{core_config.remote_server_dir}"
         destination = core_config.local_server_dir
         log.info(f"Backing up server from {source} to {destination}")
         rsync(source, destination)
