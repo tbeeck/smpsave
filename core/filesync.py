@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 def rsync(src: str, dst: str) -> int:
-    command = ['rsync', '-avz', '-e',
+    command = ['rsync', '-avz', '-P', '-e',
                'ssh -o StrictHostKeyChecking=no', src, dst]
 
     try:
