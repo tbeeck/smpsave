@@ -2,7 +2,8 @@ import logging
 from configparser import ConfigParser
 
 from core.config import CORE_CONFIG_NAMESPACE, CoreConfig
-from core.filesync import rsync
+from core.filesync import build_backup_closure, build_upload_closure
+from core.sever_lifecycle import buid_stop_closure, build_start_closure
 from servermanager import LinodeProvisioner, LinodeProvisionerConfig
 from servermanager.config import LINODE_CONFIG_NAMESPACE
 
@@ -17,22 +18,12 @@ def build_linode_provisioner() -> LinodeProvisioner:
 
     core_config = CoreConfig(**config[CORE_CONFIG_NAMESPACE])
 
-    def upload_server():
-        source = core_config.local_server_dir
-        destination = f"{core_config.remote_server_user}@{provisioner.get_host()}:{core_config.remote_server_dir}"
-        log.info(f"Uploading server from {source} to {destination}")
-        rsync(source, destination)
-
-    def backup_server():
-        source = f"{core_config.remote_server_user}@{provisioner.get_host()}:{core_config.remote_server_dir}"
-        destination = core_config.local_server_dir
-        log.info(f"Backing up server from {source} to {destination}")
-        rsync(source, destination)
-
     provisioner.poststart_hooks = [
-        upload_server
+        build_upload_closure(core_config, provisioner),
+        build_start_closure(core_config, provisioner),
     ]
     provisioner.prestop_hooks = [
-        backup_server
+        buid_stop_closure(core_config, provisioner),
+        build_backup_closure(core_config, provisioner),
     ]
     return provisioner

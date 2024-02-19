@@ -18,10 +18,12 @@ def start():
 
 
 @cli.command()
-def stop():
+@click.option("-f", "--force", is_flag=True, help="Skip stop hooks and force stop.")
+def stop(force: bool):
     print("Running stop")
     provisioner = build_linode_provisioner()
-    provisioner.stop()
+    provisioner.stop(force)
+
 
 @cli.command()
 def get_ip():

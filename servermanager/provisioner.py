@@ -8,7 +8,7 @@ from servermanager.config import LinodeProvisionerConfig
 
 log = logging.getLogger(__name__)
 
-POLL_TIMEOUT_SECONDS = 100
+POLL_TIMEOUT_SECONDS = 300
 POLL_INTERVAL_SECONDS = 5
 
 
@@ -58,14 +58,17 @@ class LinodeProvisioner():
             time.sleep(POLL_INTERVAL_SECONDS)
         return True
 
-    def stop(self):
+    def stop(self, force=False):
         """ Stop the gameserver linode """
         instance = self.get_instance()
         if not instance:
             log.info("No instance found, skipping stop step.")
             return
-        self._run_prestop_hooks()
-        log.info("Pre-stop hooks completed.")
+        if not force:
+            self._run_prestop_hooks()
+            log.info("Pre-stop hooks completed.")
+        else:
+            log.info("Force stop: skipping pre-stop hooks")
         result = instance.delete()
         if not result:
             raise Exception(
