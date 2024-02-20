@@ -29,8 +29,11 @@ def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
 
     state = BotState()
 
-    @bot.command()  # type: ignore
+    @bot.command(help="Provision and start the server")  # type: ignore
     async def start(ctx: commands.Context):
+        if state.server_lock.locked():
+            await ctx.send("Start or stop already in progress.")
+            return
         await ctx.send(f"Starting server, please wait...")
         with state.server_lock:
             try:
@@ -40,8 +43,11 @@ def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
                 log.error(f"Error starting server: {e}")
                 await ctx.send("Error starting server :(")
 
-    @bot.command()  # type: ignore
+    @bot.command(help="Shut down and deprovision the server")  # type: ignore
     async def stop(ctx: commands.Context):
+        if state.server_lock.locked():
+            await ctx.send("Start or stop already in progress.")
+            return
         await ctx.send(f"Stopping server, please wait...")
         with state.server_lock:
             try:
@@ -51,11 +57,12 @@ def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
                 log.error(f"Error stopping server: {e}")
                 await ctx.send("Error stopping server :(")
 
-    @bot.command(name="getip")  # type: ignore
+    @bot.command(name="getip",  # type: ignore
+                 help="Get the IP of the server, if it is online")
     async def get_ip(ctx: commands.Context):
         host = provisioner.get_host()
         if host:
-            await ctx.send(f"Server online, IP {host}")
+            await ctx.send(f"Server online, IP `{host}`")
         else:
             await ctx.send("Server offline")
 
