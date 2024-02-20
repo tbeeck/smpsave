@@ -8,6 +8,7 @@ DISCORD_CONFIG_NAMESPACE = "discord"
 
 @dataclass
 class DiscordBotConfig():
+    command_prefix: str
     token: str
     
     def populate_from_env(self):

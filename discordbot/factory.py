@@ -12,5 +12,5 @@ def get_bot_and_token() -> tuple[Bot, str]:
     discord_config = DiscordBotConfig(**config[DISCORD_CONFIG_NAMESPACE])
     discord_config.populate_from_env()
     provisioner = build_linode_provisioner()
-    bot = build_bot(provisioner)
+    bot = build_bot(discord_config, provisioner)
     return bot, discord_config.token
