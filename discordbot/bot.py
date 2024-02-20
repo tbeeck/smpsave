@@ -1,3 +1,4 @@
+import logging
 from threading import Lock
 
 import discord
@@ -5,6 +6,8 @@ from discord.ext import commands
 
 from discordbot.config import DiscordBotConfig
 from servermanager.provisioner import LinodeProvisioner
+
+log = logging.getLogger(__name__)
 
 
 def discord_intents() -> discord.Intents:
@@ -29,14 +32,24 @@ def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
     @bot.command()  # type: ignore
     async def start(ctx: commands.Context):
         await ctx.send(f"Starting server, please wait...")
-        provisioner.start()
-        await ctx.send(f"Server started, IP address: {provisioner.get_host()}")
+        with state.server_lock:
+            try:
+                provisioner.start()
+                await ctx.send(f"Server started, IP address: {provisioner.get_host()}")
+            except Exception as e:
+                log.error(f"Error starting server: {e}")
+                await ctx.send("Error starting server :(")
 
     @bot.command()  # type: ignore
     async def stop(ctx: commands.Context):
         await ctx.send(f"Stopping server, please wait...")
-        provisioner.stop()
-        await ctx.send(f"Server stopped.")
+        with state.server_lock:
+            try:
+                provisioner.stop()
+                await ctx.send(f"Server stopped.")
+            except Exception as e:
+                log.error(f"Error stopping server: {e}")
+                await ctx.send("Error stopping server :(")
 
     @bot.command(name="getip")  # type: ignore
     async def get_ip(ctx: commands.Context):
