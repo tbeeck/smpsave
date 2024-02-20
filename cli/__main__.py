@@ -3,7 +3,7 @@ import logging
 import click
 
 from core.factory import build_linode_provisioner
-from discordbot.factory import build_bot
+from discordbot.factory import get_bot_and_token
 
 
 @click.group()
@@ -45,8 +45,8 @@ def run(lifecycle: str):
 
 @cli.command
 def bot():
-    client, token = build_bot()
-    client.run(token)
+    bot, token = get_bot_and_token()
+    bot.run(token)
 
 
 if __name__ == '__main__':

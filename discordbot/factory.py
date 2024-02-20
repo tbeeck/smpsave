@@ -1,21 +1,16 @@
 
-import discord
+from discord.ext.commands import Bot
 
 from core.config import get_all_configurations
-from discordbot.bot import DiscordClient
+from core.factory import build_linode_provisioner
+from discordbot.bot import build_bot
 from discordbot.config import DISCORD_CONFIG_NAMESPACE, DiscordBotConfig
 
 
-def discord_intents() -> discord.Intents:
-    intents = discord.Intents.default()
-    intents.message_content = True
-    return intents
-
-
-def build_bot() -> tuple[DiscordClient, str]:
+def get_bot_and_token() -> tuple[Bot, str]:
     config = get_all_configurations()
     discord_config = DiscordBotConfig(**config[DISCORD_CONFIG_NAMESPACE])
     discord_config.populate_from_env()
-
-    bot = DiscordClient(intents=discord_intents())
+    provisioner = build_linode_provisioner()
+    bot = build_bot(provisioner)
     return bot, discord_config.token
