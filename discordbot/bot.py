@@ -24,6 +24,7 @@ class BotState():
 
 
 def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
+    config.populate_from_env()
     bot = commands.Bot(command_prefix=config.command_prefix,
                        intents=discord_intents())
 
