@@ -16,6 +16,7 @@ def read_config_files() -> ConfigParser:
 
 @dataclass
 class CoreConfig():
+    provisioner: str
     local_server_dir: str
     remote_server_dir: str
     remote_server_user: str

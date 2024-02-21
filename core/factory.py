@@ -4,10 +4,19 @@ from core.config import CORE_CONFIG_NAMESPACE, CoreConfig, read_config_files
 from core.filesync import build_backup_closure, build_upload_closure
 from core.sever_lifecycle import (buid_stop_closure, build_bootstrap_closure,
                                   build_start_closure)
-from provisioning import LinodeProvisioner, LinodeProvisionerConfig
+from provisioning import (LinodeProvisioner, LinodeProvisionerConfig,
+                          Provisioner)
 from provisioning.linode import LINODE_CONFIG_NAMESPACE
 
 log = logging.getLogger(__name__)
+
+
+def build_provisioner() -> Provisioner:
+    config = read_config_files()
+    core_config = CoreConfig(**config[CORE_CONFIG_NAMESPACE])
+    if core_config.provisioner == 'linode':
+        return build_linode_provisioner()
+    raise Exception(f"Unknown provisioner: {core_config.provisioner}")
 
 
 def build_linode_provisioner() -> LinodeProvisioner:
