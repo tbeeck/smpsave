@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from discordbot.config import DiscordBotConfig
-from provisioning.provisioner import LinodeProvisioner
+from provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class BotState():
         self.server_lock = Lock()
 
 
-def build_bot(config: DiscordBotConfig, provisioner: LinodeProvisioner):
+def build_bot(config: DiscordBotConfig, provisioner: Provisioner):
     config.populate_from_env()
     bot = commands.Bot(command_prefix=config.command_prefix,
                        intents=discord_intents())

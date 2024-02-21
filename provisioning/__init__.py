@@ -1,2 +1,1 @@
-from .config import LinodeProvisionerConfig
-from .provisioner import LinodeProvisioner
+from .linode import LinodeProvisioner, LinodeProvisionerConfig

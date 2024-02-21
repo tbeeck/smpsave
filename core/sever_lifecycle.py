@@ -7,7 +7,7 @@ import subprocess
 from typing import Callable
 
 from core.config import CoreConfig
-from provisioning.provisioner import LinodeProvisioner
+from provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
         raise e
 
 
-def build_bootstrap_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> Callable:
+def build_bootstrap_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def bootstrap():
         local_script_path = os.path.join(
             config.local_server_dir, config.server_bootstrap)
@@ -59,7 +59,7 @@ def build_bootstrap_closure(config: CoreConfig, provisioner: LinodeProvisioner) 
     return bootstrap
 
 
-def build_start_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> Callable:
+def build_start_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def start():
         entry_point_script = os.path.join(
             config.remote_server_dir, config.server_entry_point)
@@ -68,7 +68,7 @@ def build_start_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> C
     return start
 
 
-def buid_stop_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> Callable:
+def buid_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def stop():
         stop_script = os.path.join(
             config.remote_server_dir, config.server_graceful_stop)

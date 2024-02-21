@@ -3,7 +3,7 @@ import subprocess
 from typing import Callable
 
 from core.config import CoreConfig
-from provisioning.provisioner import LinodeProvisioner
+from provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 
@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 def rsync(src: str, dst: str) -> int:
     command = ['rsync', '-avz', '-P', '-e',
                'ssh -o StrictHostKeyChecking=no', src, dst]
-
     try:
         process = subprocess.run(command, check=False)
         return process.returncode
@@ -20,7 +19,7 @@ def rsync(src: str, dst: str) -> int:
         return e.returncode
 
 
-def build_upload_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> Callable:
+def build_upload_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def upload_server():
         source = config.local_server_dir
         destination = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
@@ -29,7 +28,7 @@ def build_upload_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> 
     return upload_server
 
 
-def build_backup_closure(config: CoreConfig, provisioner: LinodeProvisioner) -> Callable:
+def build_backup_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def backup_server():
         source = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
         destination = config.local_server_dir
