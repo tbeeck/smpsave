@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from discordbot.config import DiscordBotConfig
-from servermanager.provisioner import LinodeProvisioner
+from provisioning.provisioner import LinodeProvisioner
 
 log = logging.getLogger(__name__)
 

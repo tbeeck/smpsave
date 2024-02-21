@@ -4,7 +4,7 @@ from typing import Callable, Optional
 
 from linode_api4 import Instance, LinodeClient  # type: ignore
 
-from servermanager.config import LinodeProvisionerConfig
+from provisioning.config import LinodeProvisionerConfig
 
 log = logging.getLogger(__name__)
 

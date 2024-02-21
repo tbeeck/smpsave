@@ -7,7 +7,7 @@ import subprocess
 from typing import Callable
 
 from core.config import CoreConfig
-from servermanager.provisioner import LinodeProvisioner
+from provisioning.provisioner import LinodeProvisioner
 
 log = logging.getLogger(__name__)
 
