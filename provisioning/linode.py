@@ -39,15 +39,13 @@ class LinodeProvisioner(Provisioner):
 
     config: LinodeProvisionerConfig
     client: LinodeClient
-    poststart_hooks: list[Callable]
-    prestop_hooks: list[Callable]
+    poststart_hooks: list[Callable] = []
+    prestop_hooks: list[Callable] = []
 
     def __init__(self, config: LinodeProvisionerConfig):
         self.config = config
         self.config.populate_from_env()
         self.client = LinodeClient(self.config.access_token)
-        self.poststart_hooks = []
-        self.prestop_hooks = []
 
     def start(self):
         if self._get_instance():

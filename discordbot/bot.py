@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 from threading import Lock
 
 import discord
@@ -18,12 +19,14 @@ def discord_intents() -> discord.Intents:
 
 class BotState():
     server_lock: Lock
+    lease_expires: datetime
 
     def __init__(self):
         self.server_lock = Lock()
+        self.lease_expires = datetime.now()
 
 
-def build_bot(config: DiscordBotConfig, provisioner: Provisioner):
+def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bot:
     config.populate_from_env()
     bot = commands.Bot(command_prefix=config.command_prefix,
                        intents=discord_intents())
@@ -57,6 +60,23 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner):
             except Exception as e:
                 log.error(f"Error stopping server: {e}")
                 await ctx.send("Error stopping server :(")
+
+    @bot.command(name="extend",  # type: ignore
+                 help=f"Extend the lease by {config.lease_increment_minutes} minutes.")
+    async def extend_lease(ctx: commands.Context):
+        max_expire_time = datetime.now() + timedelta(minutes=config.lease_max_remaining_minutes)
+        delta = timedelta(minutes=config.lease_increment_minutes)
+        target = state.lease_expires + delta
+        if target < max_expire_time:
+            state.lease_expires = target
+        else:
+            state.lease_expires = max_expire_time
+        await ctx.send(f"Lease will now expire at: {state.lease_expires.isoformat()}")
+
+    @bot.command(name="timeremaining",  # type: ignore
+                 help="Get remaining time for the server.")
+    async def time_remaining(ctx: commands.Context):
+        await ctx.send(f"Lease will expire at: {state.lease_expires.isoformat()}")
 
     @bot.command(name="getip",  # type: ignore
                  help="Get the IP of the server, if it is online")
