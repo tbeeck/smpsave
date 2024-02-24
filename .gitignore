@@ -8,3 +8,5 @@ sync
 venv
 *.pyc
 .mypy_cache
+dist
+*.egg-info
