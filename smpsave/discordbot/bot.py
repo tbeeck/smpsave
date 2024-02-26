@@ -88,6 +88,8 @@ class BotBrain():
         await ctx.send(f"Lease will now expire at: {self.lease_expires.isoformat()}")
 
     def start_lifecycle_polling(self, ctx: commands.Context):
+        self.lease_expires = datetime.now() \
+            + timedelta(minutes=self.config.lease_max_remaining_minutes)
         self.cancel_polling_event.clear()
         self.lease_expire_warning_sent = False
         self.poll_task = asyncio.create_task(self._shutdown_polling(ctx))
