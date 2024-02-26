@@ -6,4 +6,5 @@ venv
 *.pyc
 .mypy_cache
 dist
+build
 *.egg-info

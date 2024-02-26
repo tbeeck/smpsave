@@ -28,3 +28,23 @@ This project aims to solve problems 1 and 2 above by:
     * Would also allow us to verify the server is operating normaly.
 2. Web server / daemon mode
     * Would allow for other integration points with the core server lifecycle management beyond the discord bot.
+
+## Building
+Setup and activate venv, install dependencies:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Build the package:
+```bash
+python -m build
+```
+
+## Installing
+Install from source:
+```bash
+# in root dir of repository, with venv activated
+pip install .
+```

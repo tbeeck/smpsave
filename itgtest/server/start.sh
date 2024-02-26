@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-python3 server.py
+cmd="python3 server.py"
+exec $cmd &>/dev/null & disown
