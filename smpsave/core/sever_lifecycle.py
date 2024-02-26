@@ -63,7 +63,8 @@ def _update_key_for_host(host: str):
         with open(file_path, "a") as known_hosts_file:
             subprocess.run(update_host_cmd,
                            stdout=known_hosts_file)
-    except Exception as e:
+        log.info(f"Host key updated in {file_path}.")
+    except subprocess.CalledProcessError as e:
         log.error(f"Error updating host keys for host {host}", e)
         raise e
 
