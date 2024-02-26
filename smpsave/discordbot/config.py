@@ -1,4 +1,5 @@
 import os
+
 from attr import dataclass
 
 DISCORD_CONFIG_NAMESPACE = "discord"

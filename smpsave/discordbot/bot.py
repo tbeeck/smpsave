@@ -29,8 +29,8 @@ class BotBrain():
 
     lease_expires: datetime
     poll_task: asyncio.Task
-    cancel_polling_event: Event
-    lease_expire_warning_sent: bool
+    cancel_polling_event: Event = Event()
+    lease_expire_warning_sent: bool = False
 
     def __init__(self, config: DiscordBotConfig, provisioner: Provisioner):
         self.config = config

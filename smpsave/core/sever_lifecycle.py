@@ -15,8 +15,7 @@ log = logging.getLogger(__name__)
 def run_remote_script(user: str, host: str, script_path: str):
     working_dir, script_name = os.path.split(script_path)
     cmd = f"cd {working_dir} ; ./{script_name}"
-    command = ['ssh', '-o', 'StrictHostKeyChecking=no',
-               f'{user}@{host}', cmd]
+    command = ['ssh', f'{user}@{host}', cmd]
 
     try:
         log.debug(f"Running {command} on {user}@{host}")
@@ -31,8 +30,7 @@ def run_remote_script(user: str, host: str, script_path: str):
 
 
 def run_local_script_remotely(user: str, host: str, script_path: str):
-    command = ['ssh', '-o', 'StrictHostKeyChecking=no',
-               f'{user}@{host}', 'bash -s']
+    command = ['ssh', f'{user}@{host}', 'bash -s']
 
     try:
         with open(script_path, "r") as f:
@@ -48,6 +46,34 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
     except Exception as e:
         log.error(f"Error executing local script remotely '{script_path}'")
         raise e
+
+
+def _update_key_for_host(host: str):
+    # Shell out to ssh-keygen to clear host key
+    clear_host_cmd = ['ssh-keygen', '-R', host]
+    update_host_cmd = ['ssh-keyscan', '-H', host]
+
+    try:
+        log.info(f"Clearing host key for {host}")
+        subprocess.run(clear_host_cmd)
+
+        log.info(f"Updating host key for {host}")
+        file_path = os.path.expanduser("~/.ssh/known_hosts")
+        # 'a' for append.
+        with open(file_path, "a") as known_hosts_file:
+            subprocess.run(update_host_cmd,
+                           stdout=known_hosts_file)
+    except Exception as e:
+        log.error(f"Error updating host keys for host {host}", e)
+        raise e
+
+
+def build_clear_host_key_closure(provisioner: Provisioner) -> Callable:
+    def clear_host_key():
+        host = provisioner.get_host()
+        assert host != None, "provisioner must provide host while server started"
+        _update_key_for_host(host)
+    return clear_host_key
 
 
 def build_bootstrap_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:

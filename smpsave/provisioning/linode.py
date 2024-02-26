@@ -95,6 +95,7 @@ class LinodeProvisioner(Provisioner):
     def run_poststart_hooks(self):
         try:
             for hook in self.poststart_hooks:
+                log.info(f"Running post-start hook {hook.__name__}")
                 hook()
         except Exception as e:
             log.error(f"Post-start hook '{hook.__name__}' failed: ", e)
@@ -103,6 +104,7 @@ class LinodeProvisioner(Provisioner):
     def run_prestop_hooks(self):
         try:
             for hook in self.prestop_hooks:
+                log.info(f"Running pre-stop hook {hook.__name__}")
                 hook()
         except Exception as e:
             log.error(f"Pre-stop hook ;{hook.__name__}; failed: ", e)
