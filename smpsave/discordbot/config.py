@@ -10,6 +10,7 @@ class DiscordBotConfig():
     token: str
     lease_increment_minutes: int
     lease_max_remaining_minutes: int
+    lease_warning_threshold_minutes: int = 30
 
     def populate_from_env(self):
         token = os.getenv("DISCORD_TOKEN")
