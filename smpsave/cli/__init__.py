@@ -1,5 +1,5 @@
 import logging
-from cli.cli import cli
+from smpsave.cli.cli import cli
 
 def run_cli():
     logging.basicConfig(level=logging.INFO,

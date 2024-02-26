@@ -5,8 +5,8 @@ from threading import Lock
 import discord
 from discord.ext import commands
 
-from discordbot.config import DiscordBotConfig
-from provisioning.provisioner import Provisioner
+from smpsave.discordbot.config import DiscordBotConfig
+from smpsave.provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 

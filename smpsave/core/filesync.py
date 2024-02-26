@@ -2,8 +2,8 @@ import logging
 import subprocess
 from typing import Callable
 
-from core.config import CoreConfig
-from provisioning.provisioner import Provisioner
+from smpsave.core.config import CoreConfig
+from smpsave.provisioning import Provisioner
 
 log = logging.getLogger(__name__)
 

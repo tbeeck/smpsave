@@ -1,5 +1,5 @@
 [project]
-name = "game-manager"
+name = "smpsave"
 version = "0.0.1"
 dependencies = [
     "discord.py>=2.3.2",
@@ -9,11 +9,12 @@ dependencies = [
 ]
 
 [project.scripts]
-game-manager = "cli:run_cli"
+smpsave-cli = "smpsave.cli:run_cli"
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["cli"]
+[tool.setuptools.packages.find]
+include = ["smpsave*"]
+exclude = ["smpsave.test.*"]

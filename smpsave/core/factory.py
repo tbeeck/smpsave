@@ -1,12 +1,12 @@
 import logging
 
-from core.config import CORE_CONFIG_NAMESPACE, CoreConfig, read_config_files
-from core.filesync import build_backup_closure, build_upload_closure
-from core.sever_lifecycle import (buid_stop_closure, build_bootstrap_closure,
+from smpsave.core.config import CORE_CONFIG_NAMESPACE, CoreConfig, read_config_files
+from smpsave.core.filesync import build_backup_closure, build_upload_closure
+from smpsave.core.sever_lifecycle import (buid_stop_closure, build_bootstrap_closure,
                                   build_start_closure)
-from provisioning import (LinodeProvisioner, LinodeProvisionerConfig,
+from smpsave.provisioning import (LinodeProvisioner, LinodeProvisionerConfig,
                           Provisioner)
-from provisioning.linode import LINODE_CONFIG_NAMESPACE
+from smpsave.provisioning.linode import LINODE_CONFIG_NAMESPACE
 
 log = logging.getLogger(__name__)
 

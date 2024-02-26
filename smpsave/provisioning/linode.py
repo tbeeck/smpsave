@@ -6,7 +6,7 @@ from typing import Callable, Optional
 
 from linode_api4 import Instance, LinodeClient  # type: ignore
 
-from provisioning.provisioner import Provisioner
+from smpsave.provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import click
 
-from core.factory import build_provisioner
-from discordbot.factory import get_bot_and_token
+from smpsave.discordbot.factory import get_bot_and_token
+from smpsave.core.factory import build_provisioner
 
 
 @click.group()
