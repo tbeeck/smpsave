@@ -16,3 +16,15 @@ Manually turning the server on/off as needed creates two problems:
 This project aims to solve problems 1 and 2 above by:
 1. Providing a common interface that any authorized person can use to set up / tear down the server, via a discord bot.
 2. Providing a mechanism to upload/download your server files upon the setup and tear down steps, so you keep your progress and can easily configure the server to your liking.
+
+## Script Specs
+* "bootstrap" Must install the necessary dependencies for running the game application, as well as setting up rsync to allow for server files to be up/downloaded. This is run before any server files are synced (since rsync may not exist yet) so it must be self-contained.
+* "start" Must start the server. It can do so asynchronously.
+* "stop" must stop the server. It must do so synchronously, such that the script exits only when the server process is stopped. This way we don't deprovision the server while the application is running. Doing so would cause data loss.
+
+## Potential directions
+1. Opt-in 'healthcheck' script
+    * Could be used to poll server status during startup/shutdown, so users could optionally notify 'server up' or 'server shudown' only when the server is no longer reachable (by whatever means the user defines)
+    * Would also allow us to verify the server is operating normaly.
+2. Web server / daemon mode
+    * Would allow for other integration points with the core server lifecycle management beyond the discord bot.
