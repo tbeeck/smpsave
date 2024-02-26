@@ -1,9 +1,6 @@
 # User config
 user.ini
 
-# Backup
-sync
-
 # Python
 venv
 *.pyc
