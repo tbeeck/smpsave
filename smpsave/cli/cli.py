@@ -15,6 +15,7 @@ def cli(save_logs: bool):
         handlers.append(file_handler())
     logging.basicConfig(level=logging.INFO,
                         handlers=handlers,
+                        datefmt='%Y-%m-%d %H:%M:%S',
                         format='%(asctime)s %(levelname)s %(module)s  %(message)s')
 
 
