@@ -6,6 +6,7 @@ from typing import Callable, Optional
 
 from linode_api4 import Instance, LinodeClient  # type: ignore
 
+from smpsave.configuration import BaseConfig
 from smpsave.provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ LINODE_CONFIG_NAMESPACE = "linode"
 
 
 @dataclass
-class LinodeProvisionerConfig():
+class LinodeProvisionerConfig(BaseConfig):
     access_token: str
     linode_type: str
     linode_image: str
@@ -44,7 +45,6 @@ class LinodeProvisioner(Provisioner):
 
     def __init__(self, config: LinodeProvisionerConfig):
         self.config = config
-        self.config.populate_from_env()
         self.client = LinodeClient(self.config.access_token)
 
     def start(self):

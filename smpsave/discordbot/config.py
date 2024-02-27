@@ -1,12 +1,13 @@
 import os
+from dataclasses import dataclass
 
-from attr import dataclass
+from smpsave.configuration import BaseConfig
 
 DISCORD_CONFIG_NAMESPACE = "discord"
 
 
 @dataclass
-class DiscordBotConfig():
+class DiscordBotConfig(BaseConfig):
     command_prefix: str
     token: str
     lease_increment_minutes: int

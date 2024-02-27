@@ -1,7 +1,8 @@
 import os
 from configparser import ConfigParser
+from dataclasses import dataclass
 
-from attr import dataclass
+from smpsave.configuration import BaseConfig
 
 CORE_CONFIG_NAMESPACE = "core"
 
@@ -15,7 +16,7 @@ def read_config_files() -> ConfigParser:
 
 
 @dataclass
-class CoreConfig():
+class CoreConfig(BaseConfig):
     provisioner: str
     local_server_dir: str
     remote_server_dir: str
