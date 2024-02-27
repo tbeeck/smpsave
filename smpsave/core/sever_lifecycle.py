@@ -38,8 +38,6 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
         process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             universal_newlines=True
         )
         process.communicate(input=script_content)
