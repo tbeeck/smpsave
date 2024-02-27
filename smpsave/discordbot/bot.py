@@ -31,7 +31,7 @@ class BotBrain():
     poll_task: asyncio.Task
     cancel_polling_event: Event = Event()
     lease_expire_warning_sent: bool = False
-    
+
     def __init__(self, config: DiscordBotConfig, provisioner: Provisioner):
         self.config = config
         self.provisioner = provisioner
@@ -46,7 +46,7 @@ class BotBrain():
         with self.server_lock:
             try:
                 self.provisioner.start()
-                await ctx.send(f"Server started, IP address: {self.provisioner.get_host()}")
+                await ctx.send(f"Server started, IP address: `{self.provisioner.get_host()}`")
                 self.start_lifecycle_polling(ctx)
             except Exception as e:
                 log.error(f"Error starting server: {e}")
@@ -85,7 +85,9 @@ class BotBrain():
             self.lease_expires = target
         else:
             self.lease_expires = max_expire_time
-        await ctx.send(f"Lease will now expire at: {self.lease_expires.isoformat()}")
+        await ctx.send(f"Lease will now expire in: {self.lease_time_remaining()}")
+        # Also reset the warning flag
+        self.lease_expire_warning_sent = False
 
     def start_lifecycle_polling(self, ctx: commands.Context):
         self.lease_expires = datetime.now() \
@@ -97,6 +99,9 @@ class BotBrain():
     def cancel_lifecycle_polling(self):
         self.cancel_polling_event.set()
 
+    def lease_time_remaining(self) -> timedelta:
+        return self.lease_expires - datetime.now()
+
     async def _shutdown_polling(self, ctx: commands.Context):
         while not self.cancel_polling_event.is_set():
             if datetime.now() >= self.lease_expires:
@@ -104,7 +109,9 @@ class BotBrain():
                 self.provisioner.stop()
                 break
             elif self._should_warn_about_expiration():
-                await ctx.send("Lease will expire soon!")
+                await ctx.send(
+                    f"Heads up: lease will expire in {self.lease_time_remaining()}. " + \
+                        "Use `!extend` to keep the server up!")
                 self.lease_expire_warning_sent = True
             await asyncio.sleep(1)
 
@@ -112,7 +119,7 @@ class BotBrain():
         warning_threshold = self.lease_expires - \
             timedelta(minutes=self.config.lease_warning_threshold_minutes)
         return not self.lease_expire_warning_sent and \
-            warning_threshold >= datetime.now()
+            warning_threshold <= datetime.now()
 
 
 def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bot:
@@ -130,7 +137,7 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bo
     @commands.has_role(config.allowed_role)
     async def stop(ctx: commands.Context):
         await brain.do_stop(ctx)
-    
+
     @bot.command(name="extend",  # type: ignore
                  help=f"Extend the lease by {config.lease_increment_minutes} minutes.")
     @commands.has_role(config.allowed_role)
@@ -140,9 +147,8 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bo
     @bot.command(name="timeremaining",  # type: ignore
                  help="Get remaining time for the server.")
     async def time_remaining(ctx: commands.Context):
-        remaining = brain.lease_expires.strftime("%H:%M")
-        delta = brain.lease_expires - datetime.now()
-        await ctx.send(f"Lease will expire at: {remaining} ({delta.min} minutes)")
+        remaining = brain.lease_time_remaining()
+        await ctx.send(f"Lease will expire in: {remaining}")
 
     @bot.command(name="status",  # type: ignore
                  help="Get status of the server, and its IP if it is online.")
