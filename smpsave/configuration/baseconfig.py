@@ -20,3 +20,10 @@ class BaseConfig():
                 except ValueError as e:
                     raise Exception(
                         f"Failed to parse int for '{field.name}' in '{self.__class__.__name__}'", e)
+            elif field.type == list[str]:
+                try:
+                    separated_list: list[str] = getattr(self, field.name).split(',')
+                    setattr(self, field.name, separated_list)
+                except Exception as e:
+                    raise Exception(
+                        f"Failed to parse list for '{field.name}' in '{self.__class__.__name__}'", e)

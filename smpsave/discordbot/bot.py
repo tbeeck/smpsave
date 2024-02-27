@@ -31,7 +31,7 @@ class BotBrain():
     poll_task: asyncio.Task
     cancel_polling_event: Event = Event()
     lease_expire_warning_sent: bool = False
-
+    
     def __init__(self, config: DiscordBotConfig, provisioner: Provisioner):
         self.config = config
         self.provisioner = provisioner
@@ -122,15 +122,18 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bo
     brain = BotBrain(config, provisioner)
 
     @bot.command(help="Provision and start the server")  # type: ignore
+    @commands.has_role(config.allowed_role)
     async def start(ctx: commands.Context):
         await brain.do_start(ctx)
 
     @bot.command(help="Shut down and deprovision the server")  # type: ignore
+    @commands.has_role(config.allowed_role)
     async def stop(ctx: commands.Context):
         await brain.do_stop(ctx)
-
+    
     @bot.command(name="extend",  # type: ignore
                  help=f"Extend the lease by {config.lease_increment_minutes} minutes.")
+    @commands.has_role(config.allowed_role)
     async def extend_lease(ctx: commands.Context):
         await brain.do_extend(ctx)
 
