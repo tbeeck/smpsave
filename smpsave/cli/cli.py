@@ -1,12 +1,21 @@
+import logging
+
 import click
 
-from smpsave.discordbot.factory import get_bot_and_token
+from smpsave.cli.log_config import file_handler, stream_handler
 from smpsave.core.factory import build_provisioner
+from smpsave.discordbot.factory import get_bot_and_token
 
 
 @click.group()
-def cli():
-    pass
+@click.option("--save-logs", is_flag=True, help="Use rotating log files")
+def cli(save_logs: bool):
+    handlers: list[logging.Handler] = [stream_handler()]
+    if save_logs:
+        handlers.append(file_handler())
+    logging.basicConfig(level=logging.INFO,
+                        handlers=handlers,
+                        format='%(asctime)s %(levelname)s %(module)s  %(message)s')
 
 
 @cli.command()
