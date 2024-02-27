@@ -9,7 +9,7 @@ DISCORD_CONFIG_NAMESPACE = "discord"
 @dataclass
 class DiscordBotConfig(BaseConfig):
     token: str
-    allowed_role: str
+    allowed_role: int
     command_prefix: str = "!"
     lease_increment_minutes: int = 30
     lease_warning_threshold_minutes: int = 30
