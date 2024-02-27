@@ -8,11 +8,11 @@ DISCORD_CONFIG_NAMESPACE = "discord"
 
 @dataclass
 class DiscordBotConfig(BaseConfig):
-    command_prefix: str
     token: str
-    lease_increment_minutes: int
-    lease_max_remaining_minutes: int
+    command_prefix: str = "!"
+    lease_increment_minutes: int = 30
     lease_warning_threshold_minutes: int = 30
+    lease_max_remaining_minutes: int = 120
 
     def populate_from_env(self):
         token = os.getenv("DISCORD_TOKEN")

@@ -20,7 +20,7 @@ class CoreConfig(BaseConfig):
     provisioner: str
     local_server_dir: str
     remote_server_dir: str
-    remote_server_user: str
-    server_bootstrap: str
-    server_entry_point: str
-    server_graceful_stop: str
+    remote_server_user: str = "root"
+    server_bootstrap: str = "bootstrap.sh"
+    server_entry_point: str = "start.sh"
+    server_graceful_stop: str = "stop.sh"
