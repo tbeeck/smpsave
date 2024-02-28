@@ -4,6 +4,7 @@
 import logging
 import os
 import subprocess
+import time
 from typing import Callable
 
 from smpsave.core.config import CoreConfig
@@ -46,27 +47,6 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
         raise e
 
 
-def _update_key_for_host(host: str):
-    # Shell out to ssh-keygen to clear host key
-    clear_host_cmd = ['ssh-keygen', '-R', host]
-    update_host_cmd = ['ssh-keyscan', '-H', host]
-
-    try:
-        log.info(f"Clearing host key for {host}")
-        subprocess.run(clear_host_cmd)
-
-        log.info(f"Updating host key for {host}")
-        file_path = os.path.expanduser("~/.ssh/known_hosts")
-        # 'a' for append.
-        with open(file_path, "a") as known_hosts_file:
-            subprocess.run(update_host_cmd,
-                           stdout=known_hosts_file)
-        log.info(f"Host key updated in {file_path}.")
-    except subprocess.CalledProcessError as e:
-        log.error(f"Error updating host keys for host {host}", e)
-        raise e
-
-
 def build_clear_host_key_closure(provisioner: Provisioner) -> Callable:
     def clear_host_key():
         host = provisioner.get_host()
@@ -100,3 +80,42 @@ def buid_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
         run_remote_script(config.remote_server_user,
                           provisioner.get_host(), stop_script)
     return stop
+
+
+def _update_key_for_host(host: str):
+    # Shell out to ssh-keygen to clear host key
+    clear_host_cmd = ['ssh-keygen', '-R', host]
+    update_host_cmd = ['ssh-keyscan', host]
+
+    try:
+        log.info(f"Clearing host key for {host}")
+        subprocess.run(clear_host_cmd)
+    except subprocess.CalledProcessError as e:
+        log.error(f"Failed to clear host keys for host '{host}'", e)
+        raise e
+
+    # Though the box may be provisioned, we need to try this
+    # a few times, since the ssh service may not necessarily be
+    # ready yet.
+    log.info(f"Updating host key for {host}")
+    keyscan_success = False
+    keyscan_retries_remaining = 5
+    while not keyscan_success:
+        try:
+            out = subprocess.check_output(
+                update_host_cmd, universal_newlines=True, text=True)
+            keyscan_success = True
+        except subprocess.CalledProcessError as e:
+            log.info(
+                f"Failed to update host key, {keyscan_retries_remaining} retries remaining...")
+            if keyscan_retries_remaining > 0:
+                keyscan_retries_remaining -= 1
+                time.sleep(5)
+            else:
+                raise Exception("Max retries reached for updating host key", e)
+
+    log.info("Update host key output:", out)
+    file_path = os.path.expanduser("~/.ssh/known_hosts")
+    with open(file_path, "a") as known_hosts_file:
+        known_hosts_file.write(out)
+    log.info(f"Host key updated in {file_path}.")
