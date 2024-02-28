@@ -85,7 +85,7 @@ def buid_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
 def _update_key_for_host(host: str):
     # Shell out to ssh-keygen to clear host key
     clear_host_cmd = ['ssh-keygen', '-R', host]
-    update_host_cmd = ['ssh-keyscan', host]
+    update_host_cmd = ['ssh-keyscan', '-H', host]
 
     try:
         log.info(f"Clearing host key for {host}")
