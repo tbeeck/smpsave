@@ -13,5 +13,6 @@ build
 **/*.log
 
 # Docs
-docs/_build
-!docs/_build/html
+# re-ignore whenever publishing sphinx docs to github pages is easier
+# docs/_build
+docs/_build/doctrees
