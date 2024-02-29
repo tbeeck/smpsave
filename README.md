@@ -3,6 +3,9 @@ Save money hosting private game servers on demand.
 
 See documentation for more info (docs link)
 
+![image](https://github.com/tbeeck/smpsave/assets/15240347/824f87da-94ff-46f2-b827-1da16da6cb7d)
+
+
 ## Building
 Setup and activate venv, install dependencies:
 ```bash
