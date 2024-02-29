@@ -15,4 +15,4 @@ build
 # Docs
 # re-ignore whenever publishing sphinx docs to github pages is easier
 # docs/_build
-docs/_build/doctrees
+docs/build/doctrees
