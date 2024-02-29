@@ -5,6 +5,7 @@ See documentation for more info (docs link)
 
 ![image](https://github.com/tbeeck/smpsave/assets/15240347/824f87da-94ff-46f2-b827-1da16da6cb7d)
 
+![image](https://github.com/tbeeck/smpsave/assets/15240347/cdbd1bde-6624-4c5e-88e3-e887878b3fb9)
 
 ## Building
 Setup and activate venv, install dependencies:
