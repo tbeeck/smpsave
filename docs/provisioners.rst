@@ -10,7 +10,5 @@ At the time of writing, only linode is supported. It serves as an example of how
 
 
 Linode
-===========
+======
 .. autoclass:: smpsave.provisioning.LinodeProvisioner
-
-.. autoclass:: smpsave.provisioning.LinodeProvisionerConfig

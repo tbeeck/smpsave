@@ -17,11 +17,39 @@ LINODE_CONFIG_NAMESPACE = "linode"
 @dataclass
 class LinodeProvisionerConfig(BaseConfig):
     access_token: str
+    """ 
+    Linode access token. Must provide read/write access to linodes.
+    May be overriden at runtime by the LINODE_TOKEN environment variable.
+    """
+
     linode_type: str
+    """
+    String identifying the linode type to provision. Consult linode's API
+    documentation for a complete list of options.
+    """
+
     linode_image: str
+    """
+    String identifying the image to use for the provisioned linode.
+    Consult linode's documentation for a complete list of options.
+    """
+
     linode_label: str
+    """
+    A *unique* label to identify the linode provisioned by this application.
+    """
+
     linode_region: str
+    """
+    The linode region to deploy the game server to.
+    Consult Linode's documentation for a complete list of options.
+    """
+
     public_key_path: str
+    """
+    Path to the public key on this system which the provisioned linode should authorize
+    for future incoming SSH connections.
+    """
 
     def populate_from_env(self):
         token = os.getenv("LINODE_TOKEN")

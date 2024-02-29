@@ -8,7 +8,7 @@ smpsave Documentation
 
 smpsave: save money running private game servers
 
-Welcome to the documentation of `smpsave`. 
+Welcome to the documentation of `smpsave`.
 Here you will find all of the information you need to get started using and extending the module.
 
 .. toctree::
@@ -16,6 +16,7 @@ Here you will find all of the information you need to get started using and exte
    :caption: Contents:
 
    quickstart
+   configuration
    provisioners
 
 
