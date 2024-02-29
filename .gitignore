@@ -11,3 +11,6 @@ build
 
 # Logs
 **/*.log
+
+# Docs
+docs/_build

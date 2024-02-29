@@ -1,6 +1,6 @@
 [project]
 name = "smpsave"
-version = "0.0.1"
+dynamic = ["version"]
 dependencies = [
     "discord.py>=2.3.2",
 	"linode_api4>=5.12.1",
@@ -8,12 +8,16 @@ dependencies = [
     'importlib-metadata; python_version<"3.10"',
 ]
 
+
 [project.scripts]
 smpsave-cli = "smpsave.cli:run_cli"
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "smpsave.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["smpsave*"]
