@@ -1,11 +1,7 @@
 Quick-Start Guide
 *****************
 
-This page serves as a single page which should provide all of the information 
-required to install and set up `smpsave` for use.
-
-You may still wish to consult the :doc:`provisioners` page for more detailed 
-information on your provisioner of choice.
+This page serves as a guide to get you set up using `smpsave` for your game of choice.
 
 Overview
 ========
@@ -20,6 +16,7 @@ the user must provide three things:
 
 3. The complete set of **files for your game server**.
 
+.. _requirements:
 
 Requirements
 ============
@@ -83,7 +80,74 @@ Sensitive configuration properties should generally support being set via an env
 
 See the :doc:`configuration` page for all available configuration values.
 
+**At a minimum**, the properties in the 'core' namespace and the selected provisioner's
+configuration namespace should be specified.
+
 Server Lifecycle Scripts
 ========================
 
+Because `smpsave` is agnostic to what game you wish to play, three 'lifecycle' shell scripts must 
+be provided to enable `smpsave` to setup, start and stop your application:
 
+1. 'bootstrap': This should install any required dependencies on the game server.
+This is run before the game server files are synced. Note that these dependencies include
+the dependencies of `smpsave` itself, documented in the above :ref:`requirements` section.
+
+2. 'start': This should start the game server application in a background process.
+The game server does not need to accept connections by the time this script finishes running.
+
+3. 'stop': This should gracefully stop the game server such that no data is lost.
+In contrast to the 'start' script, this must run synchronously, and only exit once the server has
+fully stopped.
+
+Example scripts for a minecraft FTB server are provided below:
+
+'bootstrap.sh'
+
+.. literalinclude:: ../example/feedthebeast/bootstrap.sh
+	:language: bash
+
+'start.sh'
+
+.. literalinclude:: ../example/feedthebeast/start.sh
+	:language: bash
+
+'stop.sh'
+
+.. literalinclude:: ../example/feedthebeast/stop.sh
+	:language: bash
+
+
+Each of these scripts should be located alongside your game server files.
+
+
+Putting It All Together
+=======================
+
+Once you've authored your configuration files and lifecycle scripts, you should have a folder that 
+looks something like this:
+
+.. code-block:: text
+
+	smpsave-home
+	├── config.ini
+	└── server-files
+		├── server_binary.bin
+		├── start.sh
+		├── stop.sh
+		└── bootstrap.sh
+
+In this case, the config.ini would likely contain these core configuration values:
+
+.. code-block:: INI
+
+	[core]
+	local_server_dir = ./server-files/
+	remote_server_dir = ~/server-files/
+	remote_server_user = root
+	server_bootstrap = bootstrap.sh
+	server_entry_point = start.sh
+	server_graceful_stop = stop.sh
+
+Within the directory containing your configuration file (in this case, `smpsave-home`) 
+you may now run `smpsave-cli` to start and stop your game sever as needed.

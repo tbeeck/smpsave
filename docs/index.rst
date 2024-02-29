@@ -9,6 +9,11 @@ smpsave Documentation
 smpsave: save money running private game servers
 
 Welcome to the documentation of `smpsave`.
+
+`smpsave` is a command line tool and Discord bot that provides a convenient way
+to set up and tear down a private game server on demand, in order to minimize
+cloud hosting costs for gamers who don't need 24/7 uptime.
+
 Here you will find all of the information you need to get started using and extending the module.
 
 .. toctree::
