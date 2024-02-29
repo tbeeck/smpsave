@@ -13,6 +13,4 @@ dist
 **/*.log
 
 # Docs
-# re-ignore whenever publishing sphinx docs to github pages is easier
-# docs/_build
-docs/build/doctrees
+docs/_build
