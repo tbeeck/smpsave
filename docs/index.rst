@@ -6,7 +6,7 @@
 smpsave Documentation
 ===================================
 
-smpsave: save money running private game servers
+`smpsave <https://github.com/tbeeck/smpsave>`_: save money running private game servers
 
 Welcome to the documentation of `smpsave`.
 
