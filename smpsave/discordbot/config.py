@@ -44,3 +44,6 @@ class DiscordBotConfig(BaseConfig):
         token = os.getenv("DISCORD_TOKEN")
         if token:
             self.token = token
+
+    def __str__(self):
+        return self.__repr__().replace(self.token, "******")
