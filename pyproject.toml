@@ -7,9 +7,17 @@ description = "Tool for provisioning private game servers on demand"
 license = { file = "LICENSE" }
 readme = "README.md"
 classifiers = [
+	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 	"Development Status :: 2 - Pre-Alpha",
  	"Intended Audience :: Developers",
-	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+	"Intended Audience :: System Administrators",
+	"Topic :: Games/Entertainment",
+	"Topic :: Utilities",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",   
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
 ]
 
 requires-python = ">=3.9"
@@ -22,7 +30,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-homepage = "https://github.com/tbeeck/smpsave"
+homepage = "https://github.com/tbeeck/smpsave/"
 documentation = "https://tbeeck.github.io/smpsave/"
 
 [project.scripts]
