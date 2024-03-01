@@ -7,6 +7,19 @@ See documentation for more info (docs link)
 
 ![image](https://github.com/tbeeck/smpsave/assets/15240347/cdbd1bde-6624-4c5e-88e3-e887878b3fb9)
 
+
+## Installing
+Install via pip:
+```bash
+pip install smpsave
+```
+
+Or install from source:
+```bash
+# in root dir of repository, with venv activated
+pip install .
+```
+
 ## Building
 Setup and activate venv, install dependencies:
 ```bash
@@ -20,14 +33,7 @@ Build the package:
 python -m build
 ```
 
-## Installing
-Install from source:
-```bash
-# in root dir of repository, with venv activated
-pip install .
-```
-
-### Elevator pitch
+## Elevator pitch
 Want a dedicated server powerful enough for your favorite game, but don't want to pay a cloud host
 nearly $50 per month? Use `smpsave` to only pay for what you need.
 
