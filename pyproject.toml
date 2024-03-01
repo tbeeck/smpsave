@@ -4,7 +4,7 @@ authors = [
     {name = "tbeeck", email = "becktimd@gmail.com"},
 ]
 description = "Tool for provisioning private game servers on demand"
-license = "GPL 3.0 or later"
+license = {text = "GPL v3 or later", file = "LICENSE" }
 readme = "README.md"
 classifiers = [
 	"Development Status :: 2 - Pre-Alpha",
