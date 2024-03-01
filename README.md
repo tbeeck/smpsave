@@ -1,4 +1,9 @@
 # smpsave - Dynamic Private Game Server Provisioner
+![PyPI - Version](https://img.shields.io/pypi/v/smpsave)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/smpsave)
+[![Docs](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml/badge.svg)](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml)
+[![PyPI Deploy](https://github.com/tbeeck/smpsave/actions/workflows/python-publish.yml/badge.svg)](https://github.com/tbeeck/smpsave/actions/workflows/python-publish.yml)
+
 Save money hosting private game servers on demand.
 
 See documentation for more info (docs link)
