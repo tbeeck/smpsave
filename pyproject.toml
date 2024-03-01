@@ -1,13 +1,29 @@
 [project]
 name = "smpsave"
-dynamic = ["version"]
+authors = [
+    {name = "tbeeck", email = "becktimd@gmail.com"},
+]
+description = "Tool for provisioning private game servers on demand"
+license = "GPL 3.0 or later"
+readme = "README.md"
+classifiers = [
+	"Development Status :: 2 - Pre-Alpha",
+ 	"Intended Audience :: Developers",
+	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+
+requires-python = ">=3.9"
 dependencies = [
     "discord.py>=2.3.2",
 	"linode_api4>=5.12.1",
 	"click>=8.1.7",
     'importlib-metadata; python_version<"3.10"',
 ]
+dynamic = ["version"]
 
+[project.urls]
+homepage = "https://github.com/tbeeck/smpsave"
+documentation = "https://tbeeck.github.io/smpsave/"
 
 [project.scripts]
 smpsave-cli = "smpsave.cli:run_cli"
