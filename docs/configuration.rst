@@ -3,7 +3,7 @@ Configuration
 
 Example configuration:
 
-.. literalinclude:: ../example/feedthebeast/config.ini
+.. literalinclude:: ../examples/feedthebeast/config.ini
 	:language: INI
 
 Some configuration values can be overriden at runtime by an environment variable.

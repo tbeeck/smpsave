@@ -104,17 +104,17 @@ Example scripts for a minecraft FTB server are provided below:
 
 'bootstrap.sh'
 
-.. literalinclude:: ../example/feedthebeast/bootstrap.sh
+.. literalinclude:: ../examples/feedthebeast/gameserver/bootstrap.sh
 	:language: bash
 
 'start.sh'
 
-.. literalinclude:: ../example/feedthebeast/start.sh
+.. literalinclude:: ../examples/feedthebeast/gameserver/start.sh
 	:language: bash
 
 'stop.sh'
 
-.. literalinclude:: ../example/feedthebeast/stop.sh
+.. literalinclude:: ../examples/feedthebeast/gameserver/stop.sh
 	:language: bash
 
 
