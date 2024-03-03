@@ -100,9 +100,10 @@ def _update_key_for_host(host: str):
     log.info(f"Updating host key for {host}")
     keyscan_success = False
     keyscan_retries_remaining = 5
+    proc_output = ""
     while not keyscan_success:
         try:
-            out = subprocess.check_output(
+            proc_output = subprocess.check_output(
                 update_host_cmd, universal_newlines=True, text=True)
             keyscan_success = True
         except subprocess.CalledProcessError as e:
@@ -114,8 +115,7 @@ def _update_key_for_host(host: str):
             else:
                 raise Exception("Max retries reached for updating host key", e)
 
-    log.info("Update host key output:", out)
     file_path = os.path.expanduser("~/.ssh/known_hosts")
     with open(file_path, "a") as known_hosts_file:
-        known_hosts_file.write(out)
+        known_hosts_file.write(proc_output)
     log.info(f"Host key updated in {file_path}.")
