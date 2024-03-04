@@ -21,6 +21,7 @@ Here you will find all of the information you need to get started using and exte
    :caption: Contents:
 
    quickstart
+   cli
    configuration
    provisioners
 
