@@ -11,8 +11,6 @@ from smpsave.provisioning import (LinodeProvisioner, LinodeProvisionerConfig,
                                   Provisioner)
 from smpsave.provisioning.linode import LINODE_CONFIG_NAMESPACE
 
-log = logging.getLogger(__name__)
-
 
 def build_provisioner() -> Provisioner:
     config = get_configurations(CORE_CONFIG_NAMESPACE, CoreConfig)

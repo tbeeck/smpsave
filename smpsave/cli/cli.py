@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from smpsave.cli.log_config import file_handler, stream_handler
+from smpsave.cli.log_config import configure_logging
 from smpsave.core.factory import build_provisioner
 from smpsave.discordbot.factory import get_bot_and_token
 
@@ -10,13 +10,7 @@ from smpsave.discordbot.factory import get_bot_and_token
 @click.group()
 @click.option("--save-logs", is_flag=True, help="Use rotating log files")
 def cli(save_logs: bool):
-    handlers: list[logging.Handler] = [stream_handler()]
-    if save_logs:
-        handlers.append(file_handler())
-    logging.basicConfig(level=logging.INFO,
-                        handlers=handlers,
-                        datefmt='%Y-%m-%d %H:%M:%S',
-                        format='%(asctime)s %(levelname)s %(module)s  %(message)s')
+    configure_logging(logging.INFO, save_logs)
 
 
 @cli.command()
@@ -26,7 +20,10 @@ def start():
 
 
 @cli.command()
-@click.option("-f", "--force", is_flag=True, help="Skip stop hooks and force stop.")
+@click.option("-f",
+              "--force",
+              is_flag=True,
+              help="Skip stop hooks and directly deprovision the server.")
 def stop(force: bool):
     provisioner = build_provisioner()
     provisioner.stop(force)
@@ -38,8 +35,10 @@ def get_ip():
     print("Host:", provisioner.get_host())
 
 
-@cli.command()
-@click.argument("lifecycle", nargs=1, type=click.STRING)
+@cli.command(help="Re-run lifecycle hooks for a particular stage. For testing/development only.")
+@click.argument("lifecycle",
+                nargs=1,
+                type=click.STRING)
 def run(lifecycle: str):
     provisioner = build_provisioner()
     if lifecycle == "start":
