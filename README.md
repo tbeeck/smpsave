@@ -1,4 +1,4 @@
-# smpsave - Dynamic Private Game Server Provisioner
+# smpsave - Dynamic Provisioner for Private Game Servers
 ![PyPI - Version](https://img.shields.io/pypi/v/smpsave)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/smpsave)
 [![Docs](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml/badge.svg)](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml)
@@ -14,7 +14,7 @@ See documentation for more info (docs link)
 
 
 ## Installing
-Install via pip:
+Install via [pip](https://pypi.org/project/smpsave/):
 ```bash
 pip install smpsave
 ```
