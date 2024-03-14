@@ -6,7 +6,11 @@
 
 Save money hosting private game servers on demand.
 
-See documentation for more info (docs link)
+* Start and stop your game server on demand through discord, let your friends do the same.
+* Back up server files between restarts.
+* Automatically shut off the server to save on costs.
+
+See [documentation](tbeeck.github.io/smpsave/) for more info.
 
 ![image](https://github.com/tbeeck/smpsave/assets/15240347/824f87da-94ff-46f2-b827-1da16da6cb7d)
 
