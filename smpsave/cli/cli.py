@@ -2,6 +2,7 @@ import logging
 
 import click
 
+from smpsave.__init__ import __version__
 from smpsave.cli.log_config import configure_logging
 from smpsave.core.factory import build_provisioner
 from smpsave.discordbot.factory import get_bot_and_token
@@ -67,3 +68,7 @@ def run(lifecycle: str):
     else:
         print("Unknown lifecycle stage:", lifecycle)
         exit(1)
+
+@cli.command(help="Print the current version of smpsave.")
+def version():
+    print(__version__)
