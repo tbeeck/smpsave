@@ -30,7 +30,7 @@ def file_handler() -> RotatingFileHandler:
 def configure_logging(level: int = logging.INFO,
                       use_file_handler: bool = False):
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(level)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(Formatter())
     root_logger.addHandler(stream_handler)

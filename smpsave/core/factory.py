@@ -1,5 +1,3 @@
-import logging
-
 from smpsave.configuration import get_configurations
 from smpsave.core.config import CORE_CONFIG_NAMESPACE, CoreConfig
 from smpsave.core.filesync import build_backup_closure, build_upload_closure
