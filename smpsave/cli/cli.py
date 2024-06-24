@@ -69,6 +69,7 @@ def run(lifecycle: str):
         print("Unknown lifecycle stage:", lifecycle)
         exit(1)
 
+
 @cli.command(help="Print the current version of smpsave.")
 def version():
     print(__version__)
