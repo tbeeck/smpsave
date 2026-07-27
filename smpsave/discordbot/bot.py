@@ -7,6 +7,7 @@ from threading import Event, Lock, Thread
 import discord
 from discord.ext import commands
 
+from smpsave.discordbot import embeds
 from smpsave.discordbot.config import DiscordBotConfig
 from smpsave.provisioning.provisioner import Provisioner
 
@@ -40,41 +41,44 @@ class BotBrain():
 
     async def do_start(self, ctx: commands.Context):
         if self.server_lock.locked():
-            await ctx.send("Start or stop already in progress.")
+            await ctx.send(embed=embeds.busy())
             return
-        await ctx.send(f"Starting server, please wait...")
+        await ctx.send(embed=embeds.starting())
         with self.server_lock:
             try:
                 self.provisioner.start()
-                await ctx.send(f"Server started, IP address: `{self.provisioner.get_host()}`")
                 self.start_lifecycle_polling(ctx)
+                await ctx.send(embed=embeds.started(
+                    str(self.provisioner.get_host()),
+                    self.lease_time_remaining(),
+                    self.config.command_prefix))
             except Exception as e:
                 log.error(f"Error starting server: {e}")
-                await ctx.send("Error starting server :(")
+                await ctx.send(embed=embeds.error("starting server"))
 
     async def do_stop(self, ctx: commands.Context):
         if self.server_lock.locked():
-            await ctx.send("Start or stop already in progress.")
+            await ctx.send(embed=embeds.busy())
             return
-        await ctx.send(f"Stopping server, please wait...")
+        await ctx.send(embed=embeds.stopping())
         with self.server_lock:
             try:
                 self.provisioner.stop()
                 self.cancel_lifecycle_polling()
-                await ctx.send(f"Server stopped.")
+                await ctx.send(embed=embeds.stopped())
             except Exception as e:
                 log.error(f"Error stopping server: {e}")
-                await ctx.send("Error stopping server :(")
+                await ctx.send(embed=embeds.error("stopping server"))
 
     async def do_status(self, ctx: commands.Context):
         ip = self.provisioner.get_host()
         if not ip and self.server_lock.locked():
-            await ctx.send(f"Server is starting.")
+            await ctx.send(embed=embeds.status_starting())
         elif ip:
-            await ctx.send(f"Server is online, ip `{ip}`\n" +
-                           f"Time remaining: {self.lease_time_remaining()}")
+            await ctx.send(embed=embeds.status_online(
+                ip, self.lease_time_remaining(), self.config.command_prefix))
         else:
-            await ctx.send("Server is offline.")
+            await ctx.send(embed=embeds.status_offline(self.config.command_prefix))
 
     async def do_extend(self, ctx: commands.Context):
         max_expire_time = \
@@ -85,7 +89,7 @@ class BotBrain():
             self.lease_expires = target
         else:
             self.lease_expires = max_expire_time
-        await ctx.send(f"Lease will now expire in: {self.lease_time_remaining()}")
+        await ctx.send(embed=embeds.lease_extended(self.lease_time_remaining()))
         # Also reset the warning flag
         self.lease_expire_warning_sent = False
 
@@ -110,14 +114,13 @@ class BotBrain():
     async def _shutdown_polling(self, ctx: commands.Context):
         while not self.cancel_polling_event.is_set():
             if datetime.now() >= self.lease_expires:
-                await ctx.send("Lease has expired, shutting down the server!")
+                await ctx.send(embed=embeds.lease_expired())
                 with self.server_lock:
                     self.provisioner.stop()
                 break
             elif self._should_warn_about_expiration():
-                await ctx.send(
-                    f"Heads up: lease will expire in {self.lease_time_remaining()}. " +
-                    f"Use `{self.config.command_prefix}extend` to keep the server up!")
+                await ctx.send(embed=embeds.lease_warning(
+                    self.lease_time_remaining(), self.config.command_prefix))
                 self.lease_expire_warning_sent = True
             await asyncio.sleep(1)
 
