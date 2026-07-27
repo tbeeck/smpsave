@@ -39,28 +39,31 @@ Requirements for the **game server**:
 Installation
 ============
 
-Currently, smpsave can only be installed from source.
-
-After cloning the repository, create and activate a virtual environment, then install the dependencies:
-
-.. code-block:: shell
-
-	$ python3 -m venv venv
-	$ source venv/bin/activate
-	(venv) $ pip install -r requirements.txt
-
-Then, either install from source:
+The recommended way to install smpsave is as a standalone tool with `uv <https://docs.astral.sh/uv/>`_,
+which installs the ``smpsave-cli`` command into its own isolated environment:
 
 .. code-block:: shell
 
-	(venv) $ pip install .
+	$ uv tool install smpsave
 
-Or, build the package and install it:
+It can also be installed with pip:
 
 .. code-block:: shell
 
-	(venv) $ python -m build
-	(venv) $ pip install dist/smpsave-$VERSION.tar.gz
+	$ pip install smpsave
+
+To install from a clone of the repository instead of PyPI:
+
+.. code-block:: shell
+
+	$ uv tool install .
+
+Or, build the package and install the resulting artifact:
+
+.. code-block:: shell
+
+	$ uv build
+	$ uv tool install dist/smpsave-$VERSION.tar.gz
 
 
 Configuring smpsave

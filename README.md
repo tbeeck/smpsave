@@ -18,28 +18,46 @@ See [documentation](https://www.timbeck.me/smpsave/) for more info.
 
 
 ## Installing
-Install via [pip](https://pypi.org/project/smpsave/):
+Install as a standalone tool with [uv](https://docs.astral.sh/uv/):
+```bash
+uv tool install smpsave
+```
+This puts `smpsave-cli` on your `PATH` in its own isolated environment. You can also run it
+without installing:
+```bash
+uvx --from smpsave smpsave-cli --help
+```
+
+Or install via [pip](https://pypi.org/project/smpsave/):
 ```bash
 pip install smpsave
 ```
 
-Or install from source:
+To install from a checkout of this repository:
 ```bash
-# in root dir of repository, with venv activated
-pip install .
+uv tool install .
+```
+
+## Developing
+Create the virtualenv and install all dependencies (including dev and docs tools):
+```bash
+uv sync
+```
+
+Run the CLI from the checkout:
+```bash
+uv run smpsave-cli --help
+```
+
+Build the docs:
+```bash
+uv run sphinx-build docs docs/_build
 ```
 
 ## Building
-Setup and activate venv, install dependencies:
+Build the sdist and wheel into `dist/`:
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Build the package:
-```bash
-python -m build
+uv build
 ```
 
 ## Elevator pitch

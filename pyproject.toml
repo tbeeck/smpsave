@@ -36,8 +36,18 @@ documentation = "https://tbeeck.github.io/smpsave/"
 [project.scripts]
 smpsave-cli = "smpsave.cli:run_cli"
 
+[dependency-groups]
+dev = [
+    "mypy>=1.8.0",
+    {include-group = "docs"},
+]
+docs = [
+    "sphinx>=7.2.6",
+    "sphinx-click>=5.1.0",
+]
+
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]

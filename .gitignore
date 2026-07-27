@@ -3,10 +3,12 @@
 
 # Python
 venv
+.venv
 *.pyc
+__pycache__
 .mypy_cache
 dist
-./build
+build
 *.egg-info
 
 # Logs
