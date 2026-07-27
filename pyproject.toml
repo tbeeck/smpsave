@@ -1,5 +1,6 @@
 [project]
 name = "smpsave"
+version = "0.2.2"
 authors = [
     {name = "tbeeck", email = "becktimd@gmail.com"},
 ]
@@ -27,7 +28,6 @@ dependencies = [
 	"click>=8.1.7",
     'importlib-metadata; python_version<"3.10"',
 ]
-dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/tbeeck/smpsave/"
@@ -49,9 +49,6 @@ docs = [
 [build-system]
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.dynamic]
-version = {attr = "smpsave.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["smpsave*"]

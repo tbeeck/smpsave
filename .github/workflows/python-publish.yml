@@ -28,6 +28,14 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
+    - name: Check release tag matches project version
+      run: |
+        project_version="$(uv version --short --color never)"
+        tag_version="${GITHUB_REF_NAME#v}"
+        if [ "$project_version" != "$tag_version" ]; then
+          echo "::error::Release tag '$GITHUB_REF_NAME' does not match the pyproject.toml version '$project_version'. Run 'uv version --bump <major|minor|patch>', commit, and re-tag."
+          exit 1
+        fi
     - name: Build package
       run: uv build
     - name: Publish package

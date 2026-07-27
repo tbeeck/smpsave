@@ -60,6 +60,14 @@ Build the sdist and wheel into `dist/`:
 uv build
 ```
 
+## Releasing
+1. Bump the version:
+   ```bash
+   uv version --bump patch   # or minor, major
+   ```
+2. Commit `pyproject.toml` and `uv.lock`, then push.
+3. Publish a GitHub release with the tag `v<version>` (e.g. `v0.2.3`). This triggers the PyPI deploy workflow.
+
 ## Elevator pitch
 Want a dedicated server powerful enough for your favorite game, but don't want to pay a cloud host
 nearly $50 per month? Use `smpsave` to only pay for what you need.
