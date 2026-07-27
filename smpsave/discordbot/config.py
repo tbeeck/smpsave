@@ -46,4 +46,4 @@ class DiscordBotConfig(BaseConfig):
             self.token = token
 
     def __str__(self):
-        return self.__repr__().replace(self.token, "******")
+        return self._redact(self.token)

@@ -15,15 +15,27 @@ _COLORS = {
 }
 
 
+LOG_FILE_MAX_BYTES = 1_000_000
+LOG_FILE_BACKUP_COUNT = 10
+
+NOISY_LOGGERS = ["discord", "urllib3", "asyncio"]
+"""
+Third party loggers that are too chatty to be useful at debug level.
+These are pinned to INFO so that smpsave's own debug output stays readable.
+"""
+
+
 def file_handler() -> RotatingFileHandler:
     log_directory = "logs"
     os.makedirs(log_directory, exist_ok=True)
 
-    handler = RotatingFileHandler(os.path.join(
-        log_directory, "smps.log"), maxBytes=10000, backupCount=10)
+    handler = RotatingFileHandler(
+        os.path.join(log_directory, "smps.log"),
+        maxBytes=LOG_FILE_MAX_BYTES,
+        backupCount=LOG_FILE_BACKUP_COUNT)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(logging.Formatter(
-        "%(asctime)s %(levelname)s %(module)s %(message)s"))
+        "%(asctime)s %(levelname)s %(module)s.%(funcName)s %(message)s"))
     return handler
 
 
@@ -37,6 +49,10 @@ def configure_logging(level: int = logging.INFO,
 
     if use_file_handler:
         root_logger.addHandler(file_handler())
+
+    if level <= logging.DEBUG:
+        for name in NOISY_LOGGERS:
+            logging.getLogger(name).setLevel(logging.INFO)
 
 
 class Formatter(logging.Formatter):

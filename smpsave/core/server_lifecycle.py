@@ -21,6 +21,7 @@ def run_remote_script(user: str, host: str, script_path: str):
     try:
         log.debug(f"Running {command} on {user}@{host}")
         returncode = subprocess.call(command, timeout=100)
+        log.debug(f"Remote script '{script_path}' exited with code {returncode}")
         if returncode != 0:
             raise Exception(
                 f"Failed to run {command} on host {host}, got exit code {returncode}")
@@ -36,14 +37,18 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
     try:
         with open(script_path, "r") as f:
             script_content = f.read()
+        log.debug(f"Piping local script '{script_path}' "
+                  f"({len(script_content)} bytes) to {user}@{host}")
         process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
             universal_newlines=True
         )
         process.communicate(input=script_content)
+        log.debug(f"Local script '{script_path}' ran remotely, "
+                  f"exit code {process.returncode}")
     except Exception as e:
-        log.error(f"Error executing local script remotely '{script_path}'")
+        log.exception(f"Error executing local script remotely '{script_path}'")
         raise e
 
 
@@ -59,6 +64,7 @@ def build_bootstrap_closure(config: CoreConfig, provisioner: Provisioner) -> Cal
     def bootstrap():
         local_script_path = os.path.join(
             config.local_server_dir, config.server_bootstrap)
+        log.debug(f"Bootstrap script resolved to '{local_script_path}'")
         run_local_script_remotely(
             config.remote_server_user, provisioner.get_host(), local_script_path)
     return bootstrap
@@ -68,6 +74,7 @@ def build_start_closure(config: CoreConfig, provisioner: Provisioner) -> Callabl
     def start():
         entry_point_script = os.path.join(
             config.remote_server_dir, config.server_entry_point)
+        log.debug(f"Entry point script resolved to '{entry_point_script}'")
         run_remote_script(config.remote_server_user,
                           provisioner.get_host(), entry_point_script)
     return start
@@ -77,6 +84,7 @@ def build_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable
     def stop():
         stop_script = os.path.join(
             config.remote_server_dir, config.server_graceful_stop)
+        log.debug(f"Stop script resolved to '{stop_script}'")
         run_remote_script(config.remote_server_user,
                           provisioner.get_host(), stop_script)
     return stop
@@ -89,9 +97,10 @@ def _update_key_for_host(host: str):
 
     try:
         log.info(f"Clearing host key for {host}")
+        log.debug(f"Running {clear_host_cmd}")
         subprocess.run(clear_host_cmd)
     except subprocess.CalledProcessError as e:
-        log.error(f"Failed to clear host keys for host '{host}'", e)
+        log.exception(f"Failed to clear host keys for host '{host}'")
         raise e
 
     # Though the box may be provisioned, we need to try this
@@ -103,8 +112,10 @@ def _update_key_for_host(host: str):
     proc_output = ""
     while not keyscan_success:
         try:
+            log.debug(f"Running {update_host_cmd}")
             proc_output = subprocess.check_output(
                 update_host_cmd, universal_newlines=True, text=True)
+            log.debug(f"ssh-keyscan returned {len(proc_output)} bytes")
             keyscan_success = True
         except subprocess.CalledProcessError as e:
             log.info(

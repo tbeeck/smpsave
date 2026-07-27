@@ -37,6 +37,15 @@ class BaseConfig():
         """
         pass
 
+    def _redact(self, secret: str) -> str:
+        """
+        Return this config's repr with `secret` masked. Empty secrets are left
+        alone, since replacing the empty string would mask every character.
+        """
+        if not secret:
+            return self.__repr__()
+        return self.__repr__().replace(secret, "******")
+
     def __post_init__(self) -> None:
         self.populate_from_env()
         class_fields: tuple[Field[Any], ...] = fields(self)

@@ -12,10 +12,15 @@ def rsync(src: str, dst: str) -> int:
     command = ['rsync', '-avz', '-P', '-e',
                'ssh', src, dst]
     try:
+        log.debug(f"Running {command}")
         process = subprocess.run(command, check=False)
+        log.debug(f"rsync exited with code {process.returncode}")
+        if process.returncode != 0:
+            log.warning(
+                f"rsync from '{src}' to '{dst}' exited with code {process.returncode}")
         return process.returncode
     except subprocess.CalledProcessError as e:
-        print(f"Error executing rsync command: {e}")
+        log.exception(f"Error executing rsync command {command}")
         return e.returncode
 
 

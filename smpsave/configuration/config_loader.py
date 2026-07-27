@@ -45,6 +45,10 @@ def load_configs() -> ConfigParser:
     configs = ConfigParser()
     loaded_files = configs.read(real_files)
     log.info(f"Loaded configurations from: {loaded_files}")
+    log.debug(f"Configuration search directory: {os.getcwd()}")
+    for section in configs.sections():
+        log.debug(f"Section [{section}] defines keys: "
+                  f"{sorted(configs[section].keys())}")
     CONFIG_PARSER = configs
     return CONFIG_PARSER
 
@@ -58,4 +62,10 @@ def get_configurations(namespace: str, clazz: type[ConfigType]) -> ConfigType:
     of the given type using those configuration values.
     """
     configs = load_configs()
-    return clazz(**configs[namespace])
+    if namespace not in configs:
+        msg = f"No '[{namespace}]' section found in configuration files {CONFIG_FILENAMES}"
+        log.error(msg)
+        raise LoadConfigurationException(msg)
+    config = clazz(**configs[namespace])
+    log.debug(f"Loaded '[{namespace}]' configuration: {config}")
+    return config

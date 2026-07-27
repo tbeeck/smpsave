@@ -1,3 +1,5 @@
+import logging
+
 from smpsave.configuration import get_configurations
 from smpsave.core.config import CORE_CONFIG_NAMESPACE, CoreConfig
 from smpsave.core.filesync import build_backup_closure, build_upload_closure
@@ -9,9 +11,12 @@ from smpsave.provisioning import (LinodeProvisioner, LinodeProvisionerConfig,
                                   Provisioner)
 from smpsave.provisioning.linode import LINODE_CONFIG_NAMESPACE
 
+log = logging.getLogger(__name__)
+
 
 def build_provisioner() -> Provisioner:
     config = get_configurations(CORE_CONFIG_NAMESPACE, CoreConfig)
+    log.debug(f"Building provisioner backend '{config.provisioner}'")
     if config.provisioner == 'linode':
         return build_linode_provisioner()
     raise Exception(f"Unknown provisioner: {config.provisioner}")

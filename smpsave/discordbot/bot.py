@@ -40,7 +40,9 @@ class BotBrain():
         self.lease_expires = datetime.now()
 
     async def do_start(self, ctx: commands.Context):
+        log.debug(f"start requested by {ctx.author} in #{ctx.channel}")
         if self.server_lock.locked():
+            log.debug("start rejected: server lock is held")
             await ctx.send(embed=embeds.busy())
             return
         await ctx.send(embed=embeds.starting())
@@ -53,11 +55,13 @@ class BotBrain():
                     self.lease_time_remaining(),
                     self.config.command_prefix))
             except Exception as e:
-                log.error(f"Error starting server: {e}")
+                log.exception(f"Error starting server: {e}")
                 await ctx.send(embed=embeds.error("starting server"))
 
     async def do_stop(self, ctx: commands.Context):
+        log.debug(f"stop requested by {ctx.author} in #{ctx.channel}")
         if self.server_lock.locked():
+            log.debug("stop rejected: server lock is held")
             await ctx.send(embed=embeds.busy())
             return
         await ctx.send(embed=embeds.stopping())
@@ -67,10 +71,11 @@ class BotBrain():
                 self.cancel_lifecycle_polling()
                 await ctx.send(embed=embeds.stopped())
             except Exception as e:
-                log.error(f"Error stopping server: {e}")
+                log.exception(f"Error stopping server: {e}")
                 await ctx.send(embed=embeds.error("stopping server"))
 
     async def do_status(self, ctx: commands.Context):
+        log.debug(f"status requested by {ctx.author} in #{ctx.channel}")
         ip = self.provisioner.get_host()
         if not ip and self.server_lock.locked():
             await ctx.send(embed=embeds.status_starting())
@@ -81,6 +86,8 @@ class BotBrain():
             await ctx.send(embed=embeds.status_offline(self.config.command_prefix))
 
     async def do_extend(self, ctx: commands.Context):
+        log.debug(f"extend requested by {ctx.author} in #{ctx.channel}, "
+                  f"lease currently expires at {self.lease_expires}")
         max_expire_time = \
             datetime.now() + timedelta(minutes=self.config.lease_max_remaining_minutes)
         delta = timedelta(minutes=self.config.lease_increment_minutes)
@@ -98,9 +105,11 @@ class BotBrain():
             + timedelta(minutes=self.config.lease_max_remaining_minutes)
         self.cancel_polling_event.clear()
         self.lease_expire_warning_sent = False
+        log.debug(f"Starting lifecycle polling, lease expires at {self.lease_expires}")
         self.poll_task = asyncio.create_task(self._shutdown_polling(ctx))
 
     def cancel_lifecycle_polling(self):
+        log.debug("Cancelling lifecycle polling")
         self.cancel_polling_event.set()
 
     def lease_time_remaining(self) -> timedelta:
@@ -114,6 +123,7 @@ class BotBrain():
     async def _shutdown_polling(self, ctx: commands.Context):
         while not self.cancel_polling_event.is_set():
             if datetime.now() >= self.lease_expires:
+                log.info("Lease expired, stopping server")
                 await ctx.send(embed=embeds.lease_expired())
                 with self.server_lock:
                     self.provisioner.stop()
@@ -132,10 +142,28 @@ class BotBrain():
 
 
 def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bot:
+    log.debug(f"Building bot with config: {config}")
     bot = commands.Bot(command_prefix=config.command_prefix,
                        intents=discord_intents())
 
     brain = BotBrain(config, provisioner)
+
+    @bot.event
+    async def on_ready():
+        log.info(f"Logged in as {bot.user}")
+        log.debug(f"Connected to guilds: {[g.name for g in bot.guilds]}")
+
+    @bot.event
+    async def on_command_error(ctx: commands.Context, error: Exception):
+        # Missing roles and unknown commands are routine, so they are only
+        # interesting at debug level. Anything else is a real failure.
+        if isinstance(error, (commands.CheckFailure, commands.CommandNotFound)):
+            log.debug(f"Command '{ctx.invoked_with}' from {ctx.author} "
+                      f"rejected: {type(error).__name__}: {error}")
+        else:
+            log.exception(
+                f"Command '{ctx.invoked_with}' from {ctx.author} failed",
+                exc_info=error)
 
     @bot.command(help="Provision and start the server")  # type: ignore
     @commands.has_role(config.allowed_role)

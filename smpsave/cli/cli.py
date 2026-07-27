@@ -12,12 +12,15 @@ from smpsave.discordbot.factory import get_bot_and_token
 @click.option("--save-logs",
               is_flag=True,
               help="Write rotating log files under the 'logs' subdirectory.")
-def cli(save_logs: bool):
+@click.option("--debug",
+              is_flag=True,
+              help="Enable debug level logging.")
+def cli(save_logs: bool, debug: bool):
     """
     Command line interface for smpsave. All subcommands use the configuration files
     in the present working directory.
     """
-    configure_logging(logging.INFO, save_logs)
+    configure_logging(logging.DEBUG if debug else logging.INFO, save_logs)
 
 
 @cli.command(help="Provision and start the gameserver.")
@@ -52,7 +55,9 @@ def status():
 @cli.command(help="Starts the discord bot.")
 def discord():
     bot, token = get_bot_and_token()
-    bot.run(token)
+    # log_handler=None keeps discord.py from installing its own root handler,
+    # which would duplicate every line and override our configured level.
+    bot.run(token, log_handler=None)
 
 
 @cli.command(help="Re-run lifecycle hooks for a particular stage. For testing/development only.")
