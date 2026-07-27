@@ -73,7 +73,7 @@ def build_start_closure(config: CoreConfig, provisioner: Provisioner) -> Callabl
     return start
 
 
-def buid_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
+def build_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def stop():
         stop_script = os.path.join(
             config.remote_server_dir, config.server_graceful_stop)

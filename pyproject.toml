@@ -31,7 +31,7 @@ dependencies = [
 
 [project.urls]
 homepage = "https://github.com/tbeeck/smpsave/"
-documentation = "https://tbeeck.github.io/smpsave/"
+documentation = "https://www.timbeck.me/smpsave/"
 
 [project.scripts]
 smpsave-cli = "smpsave.cli:run_cli"

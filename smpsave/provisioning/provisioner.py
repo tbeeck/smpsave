@@ -9,7 +9,7 @@ class Provisioner(ABC):
     def start(self):
         """ Start the server. This method should:
                 - Block until the instance is provisioned.
-                - Run post-start lifecycle hooks (post-start)
+                - Run the post-start lifecycle hooks.
         """
         pass
 

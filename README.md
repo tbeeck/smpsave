@@ -1,12 +1,11 @@
 # smpsave - Dynamic Provisioner for Private Game Servers
 ![PyPI - Version](https://img.shields.io/pypi/v/smpsave)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/smpsave)
-[![Docs](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml/badge.svg)](https://github.com/tbeeck/smpsave/actions/workflows/docs.yml)
 [![PyPI Deploy](https://github.com/tbeeck/smpsave/actions/workflows/python-publish.yml/badge.svg)](https://github.com/tbeeck/smpsave/actions/workflows/python-publish.yml)
 
 Save money hosting private game servers on demand.
 
-* Start and stop your game server on demand through discord, let your friends do the same.
+* Start and stop your game server on demand through Discord, let your friends do the same.
 * Back up server files between restarts.
 * Automatically shut off the server to save on costs.
 
@@ -72,13 +71,13 @@ uv build
 Want a dedicated server powerful enough for your favorite game, but don't want to pay a cloud host
 nearly $50 per month? Use `smpsave` to only pay for what you need.
 
-Lets say you play on your private game server 10 hours a week.
+Let's say you play on your private game server 10 hours a week.
 
-Billing before using `smpsave`: 
-* Linode 8gb shared CPU: 24/7 for all ~720 hours in a month: $48
-* ~40 hours total usage ~94% of this cost is wasted money.
+Billing before using `smpsave`:
+* Linode 8GB shared CPU, running 24/7 for all ~720 hours in a month: $48
+* With only ~40 hours of actual play, ~94% of that cost is wasted money.
 
 Billing after using `smpsave`:
-* Linode 8gb shared CPU: 10 hours a week or ~40 hours a month: **$2.88**
+* Linode 8GB shared CPU, running 10 hours a week or ~40 hours a month: **$2.88**
 
-While this could be achieved by having someone manually provision the server as needed, that individual becomes a single point of failure for keeping the game running. By exposing the server controls through discord, anyone in the group can spin up the server when they want to play.
+While this could be achieved by having someone manually provision the server as needed, that individual becomes a single point of failure for keeping the game running. By exposing the server controls through Discord, anyone in the group can spin up the server when they want to play.

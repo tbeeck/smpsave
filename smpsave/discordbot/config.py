@@ -21,7 +21,7 @@ class DiscordBotConfig(BaseConfig):
 
     command_prefix: str = "!"
     """
-    Prefix symbol used for commands (i.e., in !start, '~' is the prefix)
+    Prefix symbol used for commands (e.g., in '!start', '!' is the prefix)
     """
 
     lease_increment_minutes: int = 30
@@ -31,7 +31,7 @@ class DiscordBotConfig(BaseConfig):
 
     lease_warning_threshold_minutes: int = 30
     """
-    Remaning time threshold, in minutes, after which to provide a warning message that the 
+    Remaining time threshold, in minutes, after which to provide a warning message that the
     server will shut off soon.
     """
 

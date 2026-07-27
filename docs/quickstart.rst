@@ -24,7 +24,7 @@ Requirements
 Requirements for the system running `smpsave`, or 'facilitator':
 
 * Python 3.9+
-* Linux / MacOS (not tested on windows)
+* Linux / macOS (not tested on Windows)
 * ssh available on the $PATH
 * rsync available on the $PATH
 * An SSH key that can be used to authenticate an SSH session with the game server.
@@ -94,7 +94,8 @@ be provided to enable `smpsave` to setup, start and stop your application:
 
 1. 'bootstrap': This should install any required dependencies on the game server.
 This is run before the game server files are synced. Note that these dependencies include
-the dependencies of `smpsave` itself, documented in the above :ref:`requirements` section.
+those that `smpsave` itself relies on being present on the game server, listed under
+'Requirements for the **game server**' in the :ref:`requirements` section above.
 
 2. 'start': This should start the game server application in a background process.
 The game server does not need to accept connections by the time this script finishes running.
@@ -140,11 +141,12 @@ looks something like this:
 		├── stop.sh
 		└── bootstrap.sh
 
-In this case, the config.ini would likely contain these core configuration values:
+In this case, the config.ini would likely contain these configuration values:
 
 .. code-block:: INI
 
 	[core]
+	provisioner = linode
 	local_server_dir = ./server-files/
 	remote_server_dir = ~/server-files/
 	remote_server_user = root
@@ -152,5 +154,21 @@ In this case, the config.ini would likely contain these core configuration value
 	server_entry_point = start.sh
 	server_graceful_stop = stop.sh
 
-Within the directory containing your configuration file (in this case, `smpsave-home`) 
-you may now run `smpsave-cli` to start and stop your game sever as needed.
+	[linode]
+	access_token = TOKEN
+	public_key_path = ~/.ssh/id_ed25519.pub
+	linode_type = g6-standard-4
+	linode_image = linode/debian12
+	linode_label = my-server
+	linode_region = us-west
+
+The `provisioner` property selects which provisioner backend to use, and each provisioner
+reads its own configuration namespace: here, `linode` selects the Linode provisioner, which
+is configured under `[linode]`. See :doc:`provisioners` for the available backends.
+
+Note that `local_server_dir` and `remote_server_dir` should include a trailing slash.
+These paths are passed directly to `rsync`, which treats a path with a trailing slash as
+'the contents of this directory' and one without as 'this directory itself'.
+
+Within the directory containing your configuration file (in this case, `smpsave-home`)
+you may now run `smpsave-cli` to start and stop your game server as needed.

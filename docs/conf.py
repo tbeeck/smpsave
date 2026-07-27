@@ -8,7 +8,7 @@
 import smpsave
 
 project = 'smpsave'
-copyright = '2024, tbeeck'
+copyright = '2024-2026, tbeeck'
 author = 'tbeeck'
 release = smpsave.__version__
 
