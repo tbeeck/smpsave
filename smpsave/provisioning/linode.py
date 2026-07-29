@@ -65,7 +65,6 @@ POLL_INTERVAL_SECONDS = 5
 
 
 class LinodeProvisioner(Provisioner):
-
     config: LinodeProvisionerConfig
     client: LinodeClient
     poststart_hooks: list[Callable] = []
@@ -77,29 +76,33 @@ class LinodeProvisioner(Provisioner):
         if not config.linode_image:
             log.warning(
                 "No 'linode_image' configured. Linode will provision an instance "
-                "with no image, which cannot be booted or connected to over SSH.")
+                "with no image, which cannot be booted or connected to over SSH."
+            )
         self.client = LinodeClient(self.config.access_token)
 
     def start(self):
         existing = self._get_instance()
         if existing:
-            log.info(
-                "Instance already exists, skipping provision step")
-            log.debug(f"Existing instance id={existing.id}, "
-                      f"status={existing.status}, ipv4={existing.ipv4}")
+            log.info("Instance already exists, skipping provision step")
+            log.debug(
+                f"Existing instance id={existing.id}, "
+                f"status={existing.status}, ipv4={existing.ipv4}"
+            )
             return
         log.info("Starting instance")
-        log.debug(f"instance_create ltype={self.config.linode_type}, "
-                  f"region={self.config.linode_region}, "
-                  f"image={self.config.linode_image!r}, "
-                  f"label={self.config.linode_label}, "
-                  f"authorized_keys={[self.config.public_key_path]}")
+        log.debug(
+            f"instance_create ltype={self.config.linode_type}, "
+            f"region={self.config.linode_region}, "
+            f"image={self.config.linode_image!r}, "
+            f"label={self.config.linode_label}, "
+            f"authorized_keys={[self.config.public_key_path]}"
+        )
         result = self.client.linode.instance_create(
             ltype=self.config.linode_type,
             region=self.config.linode_region,
             image=self.config.linode_image,
             label=self.config.linode_label,
-            authorized_keys=[self.config.public_key_path]
+            authorized_keys=[self.config.public_key_path],
         )
         # instance_create returns a bare Instance when no image is requested,
         # and (Instance, root_password) when one is.
@@ -110,10 +113,13 @@ class LinodeProvisioner(Provisioner):
             log.warning(
                 "Linode returned an instance with no root password, which means "
                 "it was created without an image. Check 'linode_image' in your "
-                "configuration.")
+                "configuration."
+            )
         log.info(f"Instance id: {instance.id}")
-        log.debug(f"Created instance status={instance.status}, "
-                  f"ipv4={instance.ipv4}, region={instance.region}")
+        log.debug(
+            f"Created instance status={instance.status}, "
+            f"ipv4={instance.ipv4}, region={instance.region}"
+        )
         self._poll_until_instance_ready(instance)
         log.info("Instance started successfully.")
         self.run_poststart_hooks()
@@ -130,12 +136,13 @@ class LinodeProvisioner(Provisioner):
             log.info("Pre-stop hooks completed.")
         else:
             log.info("Force stop: skipping pre-stop hooks")
-        log.debug(f"Deleting instance id={instance.id}, "
-                  f"label={instance.label}, status={instance.status}")
+        log.debug(
+            f"Deleting instance id={instance.id}, "
+            f"label={instance.label}, status={instance.status}"
+        )
         result = instance.delete()
         if not result:
-            raise Exception(
-                f"Failed to delete linode instance {instance.label}")
+            raise Exception(f"Failed to delete linode instance {instance.label}")
         self._poll_until_instance_stopped()
         log.info("Instance stoped successfully")
 
@@ -156,8 +163,9 @@ class LinodeProvisioner(Provisioner):
         self._run_hooks("pre-stop", self.prestop_hooks)
 
     def _run_hooks(self, stage: str, hooks: list[Callable]):
-        log.debug(f"Running {len(hooks)} {stage} hook(s): "
-                  f"{[hook.__name__ for hook in hooks]}")
+        log.debug(
+            f"Running {len(hooks)} {stage} hook(s): {[hook.__name__ for hook in hooks]}"
+        )
         current = "<none>"
         try:
             for hook in hooks:
@@ -166,27 +174,28 @@ class LinodeProvisioner(Provisioner):
                 start = time.time()
                 hook()
                 log.debug(
-                    f"{stage} hook {current} finished in {time.time() - start:.1f}s")
+                    f"{stage} hook {current} finished in {time.time() - start:.1f}s"
+                )
         except Exception as e:
             log.exception(f"{stage} hook '{current}' failed")
             raise Exception(f"{stage} hook failed", e)
 
     def set_poststart_hooks(self, hooks: list[Callable]):
-        log.debug(f"Registering post-start hooks: "
-                  f"{[hook.__name__ for hook in hooks]}")
+        log.debug(f"Registering post-start hooks: {[hook.__name__ for hook in hooks]}")
         self.poststart_hooks = hooks
 
     def set_prestop_hooks(self, hooks: list[Callable]):
-        log.debug(f"Registering pre-stop hooks: "
-                  f"{[hook.__name__ for hook in hooks]}")
+        log.debug(f"Registering pre-stop hooks: {[hook.__name__ for hook in hooks]}")
         self.prestop_hooks = hooks
 
     def _poll_until_instance_stopped(self) -> bool:
         timeout_time = time.time() + POLL_TIMEOUT_SECONDS
         while self._get_instance():
             remaining = timeout_time - time.time()
-            log.debug(f"Instance still present, waiting for deletion "
-                      f"({remaining:.0f}s until timeout)")
+            log.debug(
+                f"Instance still present, waiting for deletion "
+                f"({remaining:.0f}s until timeout)"
+            )
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be deleted")
             time.sleep(POLL_INTERVAL_SECONDS)
@@ -197,8 +206,10 @@ class LinodeProvisioner(Provisioner):
         timeout_time = time.time() + POLL_TIMEOUT_SECONDS
         while instance.status != "running":
             remaining = timeout_time - time.time()
-            log.debug(f"Instance status is '{instance.status}' "
-                      f"({remaining:.0f}s until timeout)")
+            log.debug(
+                f"Instance status is '{instance.status}' "
+                f"({remaining:.0f}s until timeout)"
+            )
             if time.time() > timeout_time:
                 raise Exception("Timeout waiting for instance to be ready")
             time.sleep(POLL_INTERVAL_SECONDS)
@@ -212,6 +223,5 @@ class LinodeProvisioner(Provisioner):
         for instance in instances:
             if instance.label == self.config.linode_label:
                 return instance
-        log.debug(
-            f"No instance matched label '{self.config.linode_label}'")
+        log.debug(f"No instance matched label '{self.config.linode_label}'")
         return None

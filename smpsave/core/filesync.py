@@ -11,16 +11,16 @@ log = logging.getLogger(__name__)
 
 
 def rsync(config: CoreConfig, src: str, dst: str) -> int:
-    ssh_command = shlex.join(['ssh', *ssh_options(config)])
-    command = ['rsync', '-avz', '-P', '-e',
-               ssh_command, src, dst]
+    ssh_command = shlex.join(["ssh", *ssh_options(config)])
+    command = ["rsync", "-avz", "-P", "-e", ssh_command, src, dst]
     try:
         log.debug(f"Running {command}")
         process = subprocess.run(command, check=False)
         log.debug(f"rsync exited with code {process.returncode}")
         if process.returncode != 0:
             log.warning(
-                f"rsync from '{src}' to '{dst}' exited with code {process.returncode}")
+                f"rsync from '{src}' to '{dst}' exited with code {process.returncode}"
+            )
         return process.returncode
     except subprocess.CalledProcessError as e:
         log.exception(f"Error executing rsync command {command}")
@@ -33,6 +33,7 @@ def build_upload_closure(config: CoreConfig, provisioner: Provisioner) -> Callab
         destination = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
         log.info(f"Uploading server from {source} to {destination}")
         rsync(config, source, destination)
+
     return upload_server
 
 
@@ -42,4 +43,5 @@ def build_backup_closure(config: CoreConfig, provisioner: Provisioner) -> Callab
         destination = config.local_server_dir
         log.info(f"Backing up server from {source} to {destination}")
         rsync(config, source, destination)
+
     return backup_server

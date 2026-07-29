@@ -1,4 +1,3 @@
-
 import logging
 import os
 from logging.handlers import RotatingFileHandler
@@ -32,15 +31,18 @@ def file_handler() -> RotatingFileHandler:
     handler = RotatingFileHandler(
         os.path.join(log_directory, "smps.log"),
         maxBytes=LOG_FILE_MAX_BYTES,
-        backupCount=LOG_FILE_BACKUP_COUNT)
+        backupCount=LOG_FILE_BACKUP_COUNT,
+    )
     handler.setLevel(logging.DEBUG)
-    handler.setFormatter(logging.Formatter(
-        "%(asctime)s %(levelname)s %(module)s.%(funcName)s %(message)s"))
+    handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s %(levelname)s %(module)s.%(funcName)s %(message)s"
+        )
+    )
     return handler
 
 
-def configure_logging(level: int = logging.INFO,
-                      use_file_handler: bool = False):
+def configure_logging(level: int = logging.INFO, use_file_handler: bool = False):
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
     stream_handler = logging.StreamHandler()
@@ -56,20 +58,20 @@ def configure_logging(level: int = logging.INFO,
 
 
 class Formatter(logging.Formatter):
-    """ Acknowledement: Derived from discord.py's logging formatter """
+    """Acknowledement: Derived from discord.py's logging formatter"""
 
     LEVELS = [
-        (logging.DEBUG, _COLORS['blackbg']),
-        (logging.INFO, _COLORS['grey']),
-        (logging.WARNING, _COLORS['lightyellow']),
-        (logging.ERROR, _COLORS['red']),
-        (logging.CRITICAL, _COLORS['redbg']),
+        (logging.DEBUG, _COLORS["blackbg"]),
+        (logging.INFO, _COLORS["grey"]),
+        (logging.WARNING, _COLORS["lightyellow"]),
+        (logging.ERROR, _COLORS["red"]),
+        (logging.CRITICAL, _COLORS["redbg"]),
     ]
 
     FORMATS = {
         level: logging.Formatter(
             fmt=f"{_COLORS['grey']}%(asctime)s{_COLORS['reset']} {level_color}%(levelname)s{_COLORS['reset']} {_COLORS['magenta']}%(module)s{_COLORS['reset']}  %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
         for level, level_color in LEVELS
     }

@@ -8,7 +8,7 @@ CORE_CONFIG_NAMESPACE = "core"
 @dataclass
 class CoreConfig(BaseConfig):
     """
-    CoreConfig contains central configuration values for the application. 
+    CoreConfig contains central configuration values for the application.
     """
 
     provisioner: str

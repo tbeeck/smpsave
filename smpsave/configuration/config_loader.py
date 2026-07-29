@@ -8,14 +8,11 @@ from smpsave.configuration.baseconfig import BaseConfig
 log = logging.getLogger(__name__)
 
 # Configuration files in order of precedence
-CONFIG_FILENAMES = [
-    "config.ini",
-    "user.ini"
-]
+CONFIG_FILENAMES = ["config.ini", "user.ini"]
 
 
 class LoadConfigurationException(Exception):
-    """ 
+    """
     Exception for when we fail to initialize application configurations.
     """
 
@@ -24,7 +21,7 @@ CONFIG_PARSER: Optional[ConfigParser] = None
 
 
 def load_configs() -> ConfigParser:
-    """ 
+    """
     Load configuration files for the application.
     """
     global CONFIG_PARSER
@@ -47,8 +44,9 @@ def load_configs() -> ConfigParser:
     log.info(f"Loaded configurations from: {loaded_files}")
     log.debug(f"Configuration search directory: {os.getcwd()}")
     for section in configs.sections():
-        log.debug(f"Section [{section}] defines keys: "
-                  f"{sorted(configs[section].keys())}")
+        log.debug(
+            f"Section [{section}] defines keys: {sorted(configs[section].keys())}"
+        )
     CONFIG_PARSER = configs
     return CONFIG_PARSER
 

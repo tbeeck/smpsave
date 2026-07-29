@@ -20,10 +20,11 @@ def discord_intents() -> discord.Intents:
     return intents
 
 
-class BotBrain():
+class BotBrain:
     """
     Handles bot commands and maintains the bot's state.
     """
+
     config: DiscordBotConfig
     provisioner: Provisioner
     server_lock: Lock
@@ -50,10 +51,13 @@ class BotBrain():
             try:
                 self.provisioner.start()
                 self.start_lifecycle_polling(ctx)
-                await ctx.send(embed=embeds.started(
-                    str(self.provisioner.get_host()),
-                    self.lease_time_remaining(),
-                    self.config.command_prefix))
+                await ctx.send(
+                    embed=embeds.started(
+                        str(self.provisioner.get_host()),
+                        self.lease_time_remaining(),
+                        self.config.command_prefix,
+                    )
+                )
             except Exception as e:
                 log.exception(f"Error starting server: {e}")
                 await ctx.send(embed=embeds.error("starting server"))
@@ -80,16 +84,22 @@ class BotBrain():
         if not ip and self.server_lock.locked():
             await ctx.send(embed=embeds.status_starting())
         elif ip:
-            await ctx.send(embed=embeds.status_online(
-                ip, self.lease_time_remaining(), self.config.command_prefix))
+            await ctx.send(
+                embed=embeds.status_online(
+                    ip, self.lease_time_remaining(), self.config.command_prefix
+                )
+            )
         else:
             await ctx.send(embed=embeds.status_offline(self.config.command_prefix))
 
     async def do_extend(self, ctx: commands.Context):
-        log.debug(f"extend requested by {ctx.author} in #{ctx.channel}, "
-                  f"lease currently expires at {self.lease_expires}")
-        max_expire_time = \
-            datetime.now() + timedelta(minutes=self.config.lease_max_remaining_minutes)
+        log.debug(
+            f"extend requested by {ctx.author} in #{ctx.channel}, "
+            f"lease currently expires at {self.lease_expires}"
+        )
+        max_expire_time = datetime.now() + timedelta(
+            minutes=self.config.lease_max_remaining_minutes
+        )
         delta = timedelta(minutes=self.config.lease_increment_minutes)
         target = self.lease_expires + delta
         if target < max_expire_time:
@@ -101,8 +111,9 @@ class BotBrain():
         self.lease_expire_warning_sent = False
 
     def start_lifecycle_polling(self, ctx: commands.Context):
-        self.lease_expires = datetime.now() \
-            + timedelta(minutes=self.config.lease_max_remaining_minutes)
+        self.lease_expires = datetime.now() + timedelta(
+            minutes=self.config.lease_max_remaining_minutes
+        )
         self.cancel_polling_event.clear()
         self.lease_expire_warning_sent = False
         log.debug(f"Starting lifecycle polling, lease expires at {self.lease_expires}")
@@ -129,22 +140,26 @@ class BotBrain():
                     self.provisioner.stop()
                 break
             elif self._should_warn_about_expiration():
-                await ctx.send(embed=embeds.lease_warning(
-                    self.lease_time_remaining(), self.config.command_prefix))
+                await ctx.send(
+                    embed=embeds.lease_warning(
+                        self.lease_time_remaining(), self.config.command_prefix
+                    )
+                )
                 self.lease_expire_warning_sent = True
             await asyncio.sleep(1)
 
     def _should_warn_about_expiration(self):
-        warning_threshold = self.lease_expires - \
-            timedelta(minutes=self.config.lease_warning_threshold_minutes)
-        return not self.lease_expire_warning_sent and \
-            warning_threshold <= datetime.now()
+        warning_threshold = self.lease_expires - timedelta(
+            minutes=self.config.lease_warning_threshold_minutes
+        )
+        return (
+            not self.lease_expire_warning_sent and warning_threshold <= datetime.now()
+        )
 
 
 def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bot:
     log.debug(f"Building bot with config: {config}")
-    bot = commands.Bot(command_prefix=config.command_prefix,
-                       intents=discord_intents())
+    bot = commands.Bot(command_prefix=config.command_prefix, intents=discord_intents())
 
     brain = BotBrain(config, provisioner)
 
@@ -158,12 +173,14 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bo
         # Missing roles and unknown commands are routine, so they are only
         # interesting at debug level. Anything else is a real failure.
         if isinstance(error, (commands.CheckFailure, commands.CommandNotFound)):
-            log.debug(f"Command '{ctx.invoked_with}' from {ctx.author} "
-                      f"rejected: {type(error).__name__}: {error}")
+            log.debug(
+                f"Command '{ctx.invoked_with}' from {ctx.author} "
+                f"rejected: {type(error).__name__}: {error}"
+            )
         else:
             log.exception(
-                f"Command '{ctx.invoked_with}' from {ctx.author} failed",
-                exc_info=error)
+                f"Command '{ctx.invoked_with}' from {ctx.author} failed", exc_info=error
+            )
 
     @bot.command(help="Provision and start the server")  # type: ignore
     @commands.has_role(config.allowed_role)
@@ -175,14 +192,18 @@ def build_bot(config: DiscordBotConfig, provisioner: Provisioner) -> commands.Bo
     async def stop(ctx: commands.Context):
         await brain.do_stop(ctx)
 
-    @bot.command(name="extend",  # type: ignore
-                 help=f"Extend the lease by {config.lease_increment_minutes} minutes.")
+    @bot.command(
+        name="extend",  # type: ignore
+        help=f"Extend the lease by {config.lease_increment_minutes} minutes.",
+    )
     @commands.has_role(config.allowed_role)
     async def extend_lease(ctx: commands.Context):
         await brain.do_extend(ctx)
 
-    @bot.command(name="status",  # type: ignore
-                 help="Get status of the server, and its IP if it is online.")
+    @bot.command(
+        name="status",  # type: ignore
+        help="Get status of the server, and its IP if it is online.",
+    )
     async def status(ctx: commands.Context):
         await brain.do_status(ctx)
 

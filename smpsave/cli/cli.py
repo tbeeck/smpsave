@@ -9,12 +9,12 @@ from smpsave.discordbot.factory import get_bot_and_token
 
 
 @click.group()
-@click.option("--save-logs",
-              is_flag=True,
-              help="Write rotating log files under the 'logs' subdirectory.")
-@click.option("--debug",
-              is_flag=True,
-              help="Enable debug level logging.")
+@click.option(
+    "--save-logs",
+    is_flag=True,
+    help="Write rotating log files under the 'logs' subdirectory.",
+)
+@click.option("--debug", is_flag=True, help="Enable debug level logging.")
 def cli(save_logs: bool, debug: bool):
     """
     Command line interface for smpsave. All subcommands use the configuration files
@@ -29,14 +29,18 @@ def start():
     provisioner.start()
 
 
-@cli.command(help="""\
+@cli.command(
+    help="""\
 Stop and deprovision the gameserver.
 Pre-stop lifecycle hooks will back up the remote gameserver files to the local machine.
-""")
-@click.option("-f",
-              "--force",
-              is_flag=True,
-              help="Skip stop hooks and immediately deprovision the server. This destroys any data on the remote machine.")
+"""
+)
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    help="Skip stop hooks and immediately deprovision the server. This destroys any data on the remote machine.",
+)
 def stop(force: bool):
     provisioner = build_provisioner()
     provisioner.stop(force)
@@ -60,10 +64,10 @@ def discord():
     bot.run(token, log_handler=None)
 
 
-@cli.command(help="Re-run lifecycle hooks for a particular stage. For testing/development only.")
-@click.argument("lifecycle",
-                nargs=1,
-                type=click.STRING)
+@cli.command(
+    help="Re-run lifecycle hooks for a particular stage. For testing/development only."
+)
+@click.argument("lifecycle", nargs=1, type=click.STRING)
 def run(lifecycle: str):
     provisioner = build_provisioner()
     if lifecycle == "start":
