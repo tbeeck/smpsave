@@ -1,8 +1,7 @@
 import asyncio
 import logging
-import time
 from datetime import datetime, timedelta
-from threading import Event, Lock, Thread
+from threading import Event, Lock
 
 import discord
 from discord.ext import commands

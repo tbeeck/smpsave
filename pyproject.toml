@@ -39,6 +39,8 @@ smpsave-cli = "smpsave.cli:run_cli"
 [dependency-groups]
 dev = [
     "mypy>=1.8.0",
+    "pytest>=8.4.2",
+    "ruff>=0.16.0",
     {include-group = "docs"},
 ]
 docs = [
@@ -52,4 +54,15 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["smpsave*"]
-exclude = ["smpsave.test.*"]
+exclude = ["tests*"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: flake8-bugbear
+select = ["E", "W", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -33,7 +33,7 @@ def load_configs() -> ConfigParser:
             real_files.append(filename)
     if len(real_files) == 0:
         msg = f"""
-        No configuration files found. 
+        No configuration files found.
         Please specify smpsave configurations in one or more of the following files: {CONFIG_FILENAMES}
         """
         log.error(msg)

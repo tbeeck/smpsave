@@ -15,9 +15,9 @@ class CoreConfig(BaseConfig):
     """ User's choice of provisioner backend. """
 
     local_server_dir: str
-    """ 
-    Path to the local directory containing the game server files. 
-    This must also be the root directory for the server lifecycle scripts. 
+    """
+    Path to the local directory containing the game server files.
+    This must also be the root directory for the server lifecycle scripts.
     """
 
     remote_server_dir: str

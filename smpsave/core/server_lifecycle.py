@@ -62,7 +62,7 @@ def run_local_script_remotely(
     command = ["ssh", *ssh_options(config), f"{user}@{host}", "bash -s"]
 
     try:
-        with open(script_path, "r") as f:
+        with open(script_path) as f:
             script_content = f.read()
         log.debug(
             f"Piping local script '{script_path}' "
@@ -118,7 +118,7 @@ def build_wait_for_ssh_closure(
 ) -> Callable:
     def wait_for_ssh_ready():
         host = provisioner.get_host()
-        assert host != None, "provisioner must provide host while server started"
+        assert host is not None, "provisioner must provide host while server started"
         wait_for_ssh(config, config.remote_server_user, host)
 
     return wait_for_ssh_ready
