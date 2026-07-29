@@ -53,6 +53,29 @@ Build the docs:
 uv run sphinx-build docs docs/_build
 ```
 
+### Testing and code quality
+Run the unit tests with [pytest](https://docs.pytest.org/):
+```bash
+uv run pytest
+```
+
+Lint with [ruff](https://docs.astral.sh/ruff/) (add `--fix` to auto-fix):
+```bash
+uv run ruff check
+uv run ruff check --fix
+```
+
+Check or apply formatting with ruff (use `--check` to verify without changing files):
+```bash
+uv run ruff format --check
+uv run ruff format
+```
+
+Type-check with [mypy](https://mypy.readthedocs.io/):
+```bash
+uv run mypy smpsave
+```
+
 ## Building
 Build the sdist and wheel into `dist/`:
 ```bash
