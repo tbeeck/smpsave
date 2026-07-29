@@ -7,6 +7,7 @@ from typing import Callable, Optional
 from linode_api4 import Instance, LinodeClient  # type: ignore
 
 from smpsave.configuration import BaseConfig
+from smpsave.configuration.baseconfig import ConfigurationInitializationException
 from smpsave.provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
@@ -16,12 +17,6 @@ LINODE_CONFIG_NAMESPACE = "linode"
 
 @dataclass
 class LinodeProvisionerConfig(BaseConfig):
-    access_token: str
-    """ 
-    Linode access token. Must provide read/write access to Linodes.
-    May be overridden at runtime by the LINODE_TOKEN environment variable.
-    """
-
     linode_type: str
     """
     String identifying the Linode type to provision. Consult Linode's API
@@ -51,10 +46,23 @@ class LinodeProvisionerConfig(BaseConfig):
     for future incoming SSH connections.
     """
 
+    access_token: str = ""
+    """
+    Linode access token. Must provide read/write access to Linodes. May be
+    provided via the '[linode] access_token' config value or the LINODE_TOKEN
+    environment variable; the environment variable takes precedence. At least
+    one of the two must be set.
+    """
+
     def populate_from_env(self):
         token = os.getenv("LINODE_TOKEN")
         if token:
             self.access_token = token
+        if not self.access_token:
+            raise ConfigurationInitializationException(
+                "Linode access token must be set via the '[linode] access_token' "
+                "config value or the LINODE_TOKEN environment variable"
+            )
 
     def __str__(self):
         return self._redact(self.access_token)
