@@ -26,13 +26,14 @@ class DiscordBotConfig(BaseConfig):
 
     lease_warning_threshold_minutes: int = 30
     """
-    Remaining time threshold, in minutes, after which to provide a warning message that the
-    server will shut off soon.
+    Remaining time threshold, in minutes, after which to provide a warning
+    message that the server will shut off soon.
     """
 
     lease_max_remaining_minutes: int = 120
     """
-    Maximum duration of a server lease in minutes. The lease may not be extended beyond this time.
+    Maximum duration of a server lease in minutes. The lease may not be
+    extended beyond this time.
     """
 
     token: str = ""

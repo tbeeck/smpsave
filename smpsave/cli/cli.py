@@ -39,7 +39,10 @@ Pre-stop lifecycle hooks will back up the remote gameserver files to the local m
     "-f",
     "--force",
     is_flag=True,
-    help="Skip stop hooks and immediately deprovision the server. This destroys any data on the remote machine.",
+    help=(
+        "Skip stop hooks and immediately deprovision the server. "
+        "This destroys any data on the remote machine."
+    ),
 )
 def stop(force: bool):
     provisioner = build_provisioner()

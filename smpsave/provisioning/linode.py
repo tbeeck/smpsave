@@ -186,7 +186,7 @@ class LinodeProvisioner(Provisioner):
                 )
         except Exception as e:
             log.exception(f"{stage} hook '{current}' failed")
-            raise Exception(f"{stage} hook failed", e)
+            raise Exception(f"{stage} hook failed", e) from e
 
     def set_poststart_hooks(self, hooks: list[Callable]):
         log.debug(f"Registering post-start hooks: {[hook.__name__ for hook in hooks]}")

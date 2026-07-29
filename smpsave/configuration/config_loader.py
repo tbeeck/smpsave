@@ -34,7 +34,8 @@ def load_configs() -> ConfigParser:
     if len(real_files) == 0:
         msg = f"""
         No configuration files found.
-        Please specify smpsave configurations in one or more of the following files: {CONFIG_FILENAMES}
+        Please specify smpsave configurations in one or more of the
+        following files: {CONFIG_FILENAMES}
         """
         log.error(msg)
         raise LoadConfigurationException(msg)
@@ -61,7 +62,10 @@ def get_configurations(namespace: str, clazz: type[ConfigType]) -> ConfigType:
     """
     configs = load_configs()
     if namespace not in configs:
-        msg = f"No '[{namespace}]' section found in configuration files {CONFIG_FILENAMES}"
+        msg = (
+            f"No '[{namespace}]' section found in configuration files "
+            f"{CONFIG_FILENAMES}"
+        )
         log.error(msg)
         raise LoadConfigurationException(msg)
     config = clazz(**configs[namespace])

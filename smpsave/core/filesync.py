@@ -30,7 +30,10 @@ def rsync(config: CoreConfig, src: str, dst: str) -> int:
 def build_upload_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def upload_server():
         source = config.local_server_dir
-        destination = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
+        destination = (
+            f"{config.remote_server_user}@{provisioner.get_host()}"
+            f":{config.remote_server_dir}"
+        )
         log.info(f"Uploading server from {source} to {destination}")
         rsync(config, source, destination)
 
@@ -39,7 +42,10 @@ def build_upload_closure(config: CoreConfig, provisioner: Provisioner) -> Callab
 
 def build_backup_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
     def backup_server():
-        source = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
+        source = (
+            f"{config.remote_server_user}@{provisioner.get_host()}"
+            f":{config.remote_server_dir}"
+        )
         destination = config.local_server_dir
         log.info(f"Backing up server from {source} to {destination}")
         rsync(config, source, destination)

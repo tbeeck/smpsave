@@ -17,7 +17,8 @@ class ConfigurationParsingException(ConfigurationInitializationException):
     @staticmethod
     def fromField(f: Field, underlyingException: Exception):
         return ConfigurationParsingException(
-            f"Failed to parse '{f.name}' as '{f.type}' for configuration class '{f.__class__.__name__}'",
+            f"Failed to parse '{f.name}' as '{f.type}' for "
+            f"configuration class '{f.__class__.__name__}'",
             underlyingException,
         )
 
@@ -33,7 +34,8 @@ class BaseConfig:
 
     def populate_from_env(self):
         """
-        Abstract: Will be called in postinit. Used to map environment variable overrides to their values.
+        Abstract: Will be called in postinit. Used to map environment variable
+        overrides to their values.
         """
         pass
 
@@ -50,14 +52,16 @@ class BaseConfig:
         self.populate_from_env()
         class_fields: tuple[Field[Any], ...] = fields(self)
         for field in class_fields:
-            if field.type == int:
+            # Compare the annotation object with '==': 'list[str]' is not an
+            # identity-stable singleton, so 'is' would not match it.
+            if field.type == int:  # noqa: E721
                 try:
                     setattr(self, field.name, int(getattr(self, field.name)))
                 except ValueError as e:
-                    raise ConfigurationParsingException.fromField(field, e)
+                    raise ConfigurationParsingException.fromField(field, e) from e
             elif field.type == list[str]:
                 try:
                     separated_list: list[str] = getattr(self, field.name).split(",")
                     setattr(self, field.name, separated_list)
                 except Exception as e:
-                    raise ConfigurationParsingException.fromField(field, e)
+                    raise ConfigurationParsingException.fromField(field, e) from e

@@ -70,7 +70,11 @@ class Formatter(logging.Formatter):
 
     FORMATS = {
         level: logging.Formatter(
-            fmt=f"{_COLORS['grey']}%(asctime)s{_COLORS['reset']} {level_color}%(levelname)s{_COLORS['reset']} {_COLORS['magenta']}%(module)s{_COLORS['reset']}  %(message)s",
+            fmt=(
+                f"{_COLORS['grey']}%(asctime)s{_COLORS['reset']} "
+                f"{level_color}%(levelname)s{_COLORS['reset']} "
+                f"{_COLORS['magenta']}%(module)s{_COLORS['reset']}  %(message)s"
+            ),
             datefmt="%Y-%m-%d %H:%M:%S",
         )
         for level, level_color in LEVELS
