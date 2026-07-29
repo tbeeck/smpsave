@@ -12,11 +12,30 @@ from smpsave.provisioning.provisioner import Provisioner
 
 log = logging.getLogger(__name__)
 
+# A freshly provisioned instance reports "running" before its SSH daemon is
+# accepting connections, so we poll before running any remote hooks.
+SSH_READY_RETRIES = 24
+SSH_READY_INTERVAL_SECONDS = 5
 
-def run_remote_script(user: str, host: str, script_path: str):
+
+def ssh_options(config: CoreConfig) -> list[str]:
+    """
+    Build the common 'ssh' option flags from configuration, so every SSH-based
+    command uses an explicit identity file and consistent host-key handling
+    without relying on defaults or a writable '~/.ssh'.
+    """
+    return [
+        '-i', os.path.expanduser(config.ssh_private_key_path),
+        '-o', 'IdentitiesOnly=yes',
+        '-o', f'StrictHostKeyChecking={config.ssh_strict_host_key_checking}',
+        '-o', f'UserKnownHostsFile={os.path.expanduser(config.ssh_known_hosts_path)}',
+    ]
+
+
+def run_remote_script(config: CoreConfig, user: str, host: str, script_path: str):
     working_dir, script_name = os.path.split(script_path)
     cmd = f"cd {working_dir} ; ./{script_name}"
-    command = ['ssh', f'{user}@{host}', cmd]
+    command = ['ssh', *ssh_options(config), f'{user}@{host}', cmd]
 
     try:
         log.debug(f"Running {command} on {user}@{host}")
@@ -31,8 +50,8 @@ def run_remote_script(user: str, host: str, script_path: str):
         raise e
 
 
-def run_local_script_remotely(user: str, host: str, script_path: str):
-    command = ['ssh', f'{user}@{host}', 'bash -s']
+def run_local_script_remotely(config: CoreConfig, user: str, host: str, script_path: str):
+    command = ['ssh', *ssh_options(config), f'{user}@{host}', 'bash -s']
 
     try:
         with open(script_path, "r") as f:
@@ -52,12 +71,36 @@ def run_local_script_remotely(user: str, host: str, script_path: str):
         raise e
 
 
-def build_clear_host_key_closure(provisioner: Provisioner) -> Callable:
-    def clear_host_key():
+def wait_for_ssh(config: CoreConfig, user: str, host: str):
+    """
+    Poll until the host accepts an SSH connection. A freshly provisioned instance
+    reports "running" before its SSH daemon is up, so this must succeed before any
+    remote lifecycle hook runs. Replaces the readiness wait that the old
+    ssh-keyscan host-key step provided.
+    """
+    command = ['ssh', *ssh_options(config), '-o',
+               'ConnectTimeout=10', f'{user}@{host}', 'true']
+    log.info(f"Waiting for SSH on {user}@{host} to become available")
+    for attempt in range(1, SSH_READY_RETRIES + 1):
+        log.debug(f"SSH readiness check attempt {attempt}: {command}")
+        returncode = subprocess.call(command)
+        if returncode == 0:
+            log.info(f"SSH on {host} is available")
+            return
+        log.debug(f"SSH not ready (exit {returncode}), "
+                  f"{SSH_READY_RETRIES - attempt} attempt(s) remaining")
+        time.sleep(SSH_READY_INTERVAL_SECONDS)
+    raise Exception(
+        f"Timed out waiting for SSH on {user}@{host} after "
+        f"{SSH_READY_RETRIES * SSH_READY_INTERVAL_SECONDS}s")
+
+
+def build_wait_for_ssh_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
+    def wait_for_ssh_ready():
         host = provisioner.get_host()
         assert host != None, "provisioner must provide host while server started"
-        _update_key_for_host(host)
-    return clear_host_key
+        wait_for_ssh(config, config.remote_server_user, host)
+    return wait_for_ssh_ready
 
 
 def build_bootstrap_closure(config: CoreConfig, provisioner: Provisioner) -> Callable:
@@ -66,7 +109,7 @@ def build_bootstrap_closure(config: CoreConfig, provisioner: Provisioner) -> Cal
             config.local_server_dir, config.server_bootstrap)
         log.debug(f"Bootstrap script resolved to '{local_script_path}'")
         run_local_script_remotely(
-            config.remote_server_user, provisioner.get_host(), local_script_path)
+            config, config.remote_server_user, provisioner.get_host(), local_script_path)
     return bootstrap
 
 
@@ -75,7 +118,7 @@ def build_start_closure(config: CoreConfig, provisioner: Provisioner) -> Callabl
         entry_point_script = os.path.join(
             config.remote_server_dir, config.server_entry_point)
         log.debug(f"Entry point script resolved to '{entry_point_script}'")
-        run_remote_script(config.remote_server_user,
+        run_remote_script(config, config.remote_server_user,
                           provisioner.get_host(), entry_point_script)
     return start
 
@@ -85,48 +128,6 @@ def build_stop_closure(config: CoreConfig, provisioner: Provisioner) -> Callable
         stop_script = os.path.join(
             config.remote_server_dir, config.server_graceful_stop)
         log.debug(f"Stop script resolved to '{stop_script}'")
-        run_remote_script(config.remote_server_user,
+        run_remote_script(config, config.remote_server_user,
                           provisioner.get_host(), stop_script)
     return stop
-
-
-def _update_key_for_host(host: str):
-    # Shell out to ssh-keygen to clear host key
-    clear_host_cmd = ['ssh-keygen', '-R', host]
-    update_host_cmd = ['ssh-keyscan', '-H', host]
-
-    try:
-        log.info(f"Clearing host key for {host}")
-        log.debug(f"Running {clear_host_cmd}")
-        subprocess.run(clear_host_cmd)
-    except subprocess.CalledProcessError as e:
-        log.exception(f"Failed to clear host keys for host '{host}'")
-        raise e
-
-    # Though the box may be provisioned, we need to try this
-    # a few times, since the ssh service may not necessarily be
-    # ready yet.
-    log.info(f"Updating host key for {host}")
-    keyscan_success = False
-    keyscan_retries_remaining = 5
-    proc_output = ""
-    while not keyscan_success:
-        try:
-            log.debug(f"Running {update_host_cmd}")
-            proc_output = subprocess.check_output(
-                update_host_cmd, universal_newlines=True, text=True)
-            log.debug(f"ssh-keyscan returned {len(proc_output)} bytes")
-            keyscan_success = True
-        except subprocess.CalledProcessError as e:
-            log.info(
-                f"Failed to update host key, {keyscan_retries_remaining} retries remaining...")
-            if keyscan_retries_remaining > 0:
-                keyscan_retries_remaining -= 1
-                time.sleep(5)
-            else:
-                raise Exception("Max retries reached for updating host key", e)
-
-    file_path = os.path.expanduser("~/.ssh/known_hosts")
-    with open(file_path, "a") as known_hosts_file:
-        known_hosts_file.write(proc_output)
-    log.info(f"Host key updated in {file_path}.")

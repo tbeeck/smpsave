@@ -153,6 +153,7 @@ In this case, the config.ini would likely contain these configuration values:
 	server_bootstrap = bootstrap.sh
 	server_entry_point = start.sh
 	server_graceful_stop = stop.sh
+	ssh_private_key_path = ~/.ssh/id_ed25519
 
 	[linode]
 	access_token = TOKEN
@@ -169,6 +170,15 @@ is configured under `[linode]`. See :doc:`provisioners` for the available backen
 Note that `local_server_dir` and `remote_server_dir` should include a trailing slash.
 These paths are passed directly to `rsync`, which treats a path with a trailing slash as
 'the contents of this directory' and one without as 'this directory itself'.
+
+The `ssh_private_key_path` property points `ssh` at the private key used to connect to the
+game server (via `ssh -i`), so the key may live at any path rather than the default
+`~/.ssh/id_*`. Two further `[core]` options control host-key handling:
+`ssh_strict_host_key_checking` (default `accept-new`) and `ssh_known_hosts_path`
+(default `/dev/null`). The defaults suit a freshly provisioned server that receives a new
+host key each time, and they let smpsave run without a writable `~/.ssh` (useful in
+containerized/Kubernetes deployments). Point `ssh_known_hosts_path` at a real, writable file
+if you want trust-on-first-use host-key pinning across connections.
 
 Within the directory containing your configuration file (in this case, `smpsave-home`)
 you may now run `smpsave-cli` to start and stop your game server as needed.

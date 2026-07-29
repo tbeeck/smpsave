@@ -1,16 +1,19 @@
 import logging
+import shlex
 import subprocess
 from typing import Callable
 
 from smpsave.core.config import CoreConfig
+from smpsave.core.server_lifecycle import ssh_options
 from smpsave.provisioning import Provisioner
 
 log = logging.getLogger(__name__)
 
 
-def rsync(src: str, dst: str) -> int:
+def rsync(config: CoreConfig, src: str, dst: str) -> int:
+    ssh_command = shlex.join(['ssh', *ssh_options(config)])
     command = ['rsync', '-avz', '-P', '-e',
-               'ssh', src, dst]
+               ssh_command, src, dst]
     try:
         log.debug(f"Running {command}")
         process = subprocess.run(command, check=False)
@@ -29,7 +32,7 @@ def build_upload_closure(config: CoreConfig, provisioner: Provisioner) -> Callab
         source = config.local_server_dir
         destination = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
         log.info(f"Uploading server from {source} to {destination}")
-        rsync(source, destination)
+        rsync(config, source, destination)
     return upload_server
 
 
@@ -38,5 +41,5 @@ def build_backup_closure(config: CoreConfig, provisioner: Provisioner) -> Callab
         source = f"{config.remote_server_user}@{provisioner.get_host()}:{config.remote_server_dir}"
         destination = config.local_server_dir
         log.info(f"Backing up server from {source} to {destination}")
-        rsync(source, destination)
+        rsync(config, source, destination)
     return backup_server
