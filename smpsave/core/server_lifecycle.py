@@ -75,6 +75,11 @@ def run_local_script_remotely(
         log.debug(
             f"Local script '{script_path}' ran remotely, exit code {process.returncode}"
         )
+        if process.returncode != 0:
+            raise Exception(
+                f"Local script '{script_path}' run remotely on {user}@{host} "
+                f"exited with code {process.returncode}"
+            )
     except Exception as e:
         log.exception(f"Error executing local script remotely '{script_path}'")
         raise e
