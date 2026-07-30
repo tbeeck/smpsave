@@ -23,7 +23,8 @@ class CoreConfig(BaseConfig):
     remote_server_dir: str
     """
     The directory in the game server's filesystem that the local server files
-    should be synced to. Include a trailing slash.
+    should be synced to. A trailing slash is not required; it is normalized for
+    rsync automatically. Created on the remote host if it does not yet exist.
     """
 
     remote_server_user: str = "root"
