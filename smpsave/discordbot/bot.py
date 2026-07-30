@@ -48,7 +48,7 @@ class BotBrain:
         await ctx.send(embed=embeds.starting())
         with self.server_lock:
             try:
-                self.provisioner.start()
+                await asyncio.to_thread(self.provisioner.start)
                 self.start_lifecycle_polling(ctx)
                 await ctx.send(
                     embed=embeds.started(
@@ -70,7 +70,7 @@ class BotBrain:
         await ctx.send(embed=embeds.stopping())
         with self.server_lock:
             try:
-                self.provisioner.stop()
+                await asyncio.to_thread(self.provisioner.stop)
                 self.cancel_lifecycle_polling()
                 await ctx.send(embed=embeds.stopped())
             except Exception as e:
@@ -136,7 +136,7 @@ class BotBrain:
                 log.info("Lease expired, stopping server")
                 await ctx.send(embed=embeds.lease_expired())
                 with self.server_lock:
-                    self.provisioner.stop()
+                    await asyncio.to_thread(self.provisioner.stop)
                 break
             elif self._should_warn_about_expiration():
                 await ctx.send(
