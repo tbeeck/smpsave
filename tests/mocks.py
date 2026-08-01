@@ -74,3 +74,54 @@ class MockProvisioner(Provisioner):
 
     def set_prestop_hooks(self, hooks: list[Callable]):
         pass
+
+
+class MockLinodeInstance:
+    """Stand-in for a linode_api4 Instance."""
+
+    def __init__(
+        self,
+        id: int = 1,
+        label: str = "smpsave-test",
+        status: str = "running",
+        ipv4: Optional[list] = None,
+        delete_result: bool = True,
+    ):
+        self.id = id
+        self.label = label
+        self.status = status
+        self.ipv4 = ["1.2.3.4"] if ipv4 is None else ipv4
+        self.region = "us-lax"
+        self.delete_result = delete_result
+        self.delete_calls = 0
+        self._deleted = False
+
+    def delete(self):
+        self.delete_calls += 1
+        # A successful delete removes the instance from later lookups.
+        if self.delete_result:
+            self._deleted = True
+        return self.delete_result
+
+
+class _MockLinodeApi:
+    def __init__(self, instances: Optional[list] = None, create_result=None):
+        self._instances = list(instances or [])
+        self.create_result = create_result
+        self.create_calls: list[dict] = []
+
+    def instances(self, *filters):
+        # The real client filters server-side; here we just drop deleted ones
+        # and let the provisioner do its own label matching.
+        return [i for i in self._instances if not getattr(i, "_deleted", False)]
+
+    def instance_create(self, **kwargs):
+        self.create_calls.append(kwargs)
+        return self.create_result
+
+
+class MockLinodeClient:
+    """Stand-in for linode_api4.LinodeClient exposing only what smpsave uses."""
+
+    def __init__(self, instances: Optional[list] = None, create_result=None):
+        self.linode = _MockLinodeApi(instances=instances, create_result=create_result)
