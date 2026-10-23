@@ -10,7 +10,6 @@ import contextlib
 import threading
 from dataclasses import replace
 from datetime import datetime, timedelta
-from typing import Optional
 
 from smpsave.discordbot import embeds
 from smpsave.discordbot.bot import BotBrain
@@ -49,7 +48,7 @@ def make_config(**overrides) -> DiscordBotConfig:
     return replace(base, **overrides) if overrides else base
 
 
-def make_brain(provisioner: Optional[MockProvisioner] = None, **config_overrides):
+def make_brain(provisioner: MockProvisioner | None = None, **config_overrides):
     provisioner = provisioner or MockProvisioner()
     brain = BotBrain(make_config(**config_overrides), provisioner)
     return brain, provisioner

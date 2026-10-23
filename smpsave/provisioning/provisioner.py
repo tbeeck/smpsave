@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Optional
+from collections.abc import Callable
 
 
 class Provisioner(ABC):
@@ -21,7 +21,7 @@ class Provisioner(ABC):
         pass
 
     @abstractmethod
-    def get_host(self) -> Optional[str]:
+    def get_host(self) -> str | None:
         """Return the IP address of the provisioned host,
         or None if the server has not been provisioned
         """

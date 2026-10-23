@@ -1,5 +1,4 @@
 from datetime import timedelta
-from typing import Optional
 
 import discord
 
@@ -23,7 +22,7 @@ def format_duration(delta: timedelta) -> str:
 
 
 def _embed(
-    title: str, color: discord.Color, description: Optional[str] = None
+    title: str, color: discord.Color, description: str | None = None
 ) -> discord.Embed:
     return discord.Embed(title=title, description=description, color=color)
 
@@ -108,7 +107,7 @@ def lease_expired() -> discord.Embed:
     return _embed("⌛ Lease expired", WARNING_COLOR, "Shutting down the server!")
 
 
-def error(action: str, detail: Optional[str] = None) -> discord.Embed:
+def error(action: str, detail: str | None = None) -> discord.Embed:
     embed = _embed(f"❌ Error {action}", ERROR_COLOR)
     if detail:
         embed.add_field(name="Details", value=f"```{detail[:1000]}```", inline=False)

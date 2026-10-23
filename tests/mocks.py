@@ -3,7 +3,7 @@
 import asyncio
 import functools
 import threading
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from smpsave.provisioning.provisioner import Provisioner
 
@@ -33,16 +33,16 @@ async def wait_until(predicate, timeout: float = 5.0):
 class MockProvisioner(Provisioner):
     """In-memory provisioner with hooks to control timing and failures."""
 
-    def __init__(self, host: Optional[str] = None):
+    def __init__(self, host: str | None = None):
         self._host = host
         self.start_calls = 0
         self.stop_calls = 0
         # When set, start()/stop() block on this event, letting a test hold a
         # lock open while it checks concurrent behavior.
-        self.start_gate: Optional[threading.Event] = None
-        self.stop_gate: Optional[threading.Event] = None
-        self.start_error: Optional[Exception] = None
-        self.stop_error: Optional[Exception] = None
+        self.start_gate: threading.Event | None = None
+        self.stop_gate: threading.Event | None = None
+        self.start_error: Exception | None = None
+        self.stop_error: Exception | None = None
 
     def start(self):
         self.start_calls += 1
@@ -60,7 +60,7 @@ class MockProvisioner(Provisioner):
             raise self.stop_error
         self._host = None
 
-    def get_host(self) -> Optional[str]:
+    def get_host(self) -> str | None:
         return self._host
 
     def run_poststart_hooks(self):
@@ -84,7 +84,7 @@ class MockLinodeInstance:
         id: int = 1,
         label: str = "smpsave-test",
         status: str = "running",
-        ipv4: Optional[list] = None,
+        ipv4: list | None = None,
         delete_result: bool = True,
     ):
         self.id = id
@@ -105,7 +105,7 @@ class MockLinodeInstance:
 
 
 class _MockLinodeApi:
-    def __init__(self, instances: Optional[list] = None, create_result=None):
+    def __init__(self, instances: list | None = None, create_result=None):
         self._instances = list(instances or [])
         self.create_result = create_result
         self.create_calls: list[dict] = []
@@ -123,5 +123,5 @@ class _MockLinodeApi:
 class MockLinodeClient:
     """Stand-in for linode_api4.LinodeClient exposing only what smpsave uses."""
 
-    def __init__(self, instances: Optional[list] = None, create_result=None):
+    def __init__(self, instances: list | None = None, create_result=None):
         self.linode = _MockLinodeApi(instances=instances, create_result=create_result)

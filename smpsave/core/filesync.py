@@ -1,7 +1,7 @@
 import logging
 import shlex
 import subprocess
-from typing import Callable
+from collections.abc import Callable
 
 from smpsave.core.config import CoreConfig
 from smpsave.core.server_lifecycle import ssh_options

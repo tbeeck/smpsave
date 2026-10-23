@@ -5,7 +5,7 @@ import logging
 import os
 import subprocess
 import time
-from typing import Callable
+from collections.abc import Callable
 
 from smpsave.core.config import CoreConfig
 from smpsave.provisioning.provisioner import Provisioner

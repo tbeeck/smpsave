@@ -1,8 +1,8 @@
 import logging
 import os
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 from linode_api4 import Instance, LinodeClient  # type: ignore
 
@@ -154,7 +154,7 @@ class LinodeProvisioner(Provisioner):
         self._poll_until_instance_stopped()
         log.info("Instance stoped successfully")
 
-    def get_host(self) -> Optional[str]:
+    def get_host(self) -> str | None:
         instance = self._get_instance()
         if not instance:
             log.debug("get_host: no instance found")
@@ -224,7 +224,7 @@ class LinodeProvisioner(Provisioner):
         log.debug(f"Instance reported ready, ipv4={instance.ipv4}")
         return True
 
-    def _get_instance(self) -> Optional[Instance]:
+    def _get_instance(self) -> Instance | None:
         instances = self.client.linode.instances(
             Instance.label == self.config.linode_label
         )

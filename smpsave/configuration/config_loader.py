@@ -1,7 +1,7 @@
 import logging
 import os
 from configparser import ConfigParser
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 from smpsave.configuration.baseconfig import BaseConfig
 
@@ -17,7 +17,7 @@ class LoadConfigurationException(Exception):
     """
 
 
-CONFIG_PARSER: Optional[ConfigParser] = None
+CONFIG_PARSER: ConfigParser | None = None
 
 
 def load_configs() -> ConfigParser:
